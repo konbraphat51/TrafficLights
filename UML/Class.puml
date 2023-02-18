@@ -1,0 +1,81 @@
+@startuml
+
+package Common{
+    class InputManager{
+        -keyActions : UnityEvent
+    }
+}
+
+package InGame{
+    package Roads{
+        class Road{
+            +connectedJoints : Joint[]
+            -OptimizeArrangement() : void
+            -GetJoints() : void
+        }
+
+        class Joint{
+            +connectedRoads : Road[]
+            +RegisterConnection() : void
+        }
+
+        Road - Joint
+
+        class Intersection{
+            +allowedRoads : Road[]
+            +ChangeAllowance() : void
+        }
+
+        Joint <|-- Intersection
+
+        class OutsideConnection{
+            +spawnPossibility : float
+        }
+
+        Joint <|-- OutsideConnection
+
+        class TrafficLight{
+            -lightState : enum
+            +ToggleLight() : void
+        }
+
+        Intersection o-- TrafficLight
+
+        InputManager -- TrafficLight
+    }
+    
+    class Car{
+        -destination : OutsideConnection
+        -drivingTime : float
+        -Run() : void
+        -Turn() : void
+    }
+
+    Car --> Roads
+
+    class CarGenerator{
+        -carLimit : int
+        -outsideConnections : OutsideConnection[]
+        -appearingCars : Car[]
+        -GetOutsideConnection() : void
+        -SpawnCar() : void
+    }
+
+    CarGenerator --> Car
+    CarGenerator --> OutsideConnection
+
+    package Managers{
+        class UIManagerInGame{
+            -UpdateUIs() : void
+        }
+
+        class GameManagerInGame{
+            +sequence : enum
+            +score : int
+            +timeLeft : float
+            +AddPoint() : void
+        }
+    }
+}
+
+@enduml
