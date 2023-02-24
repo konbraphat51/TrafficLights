@@ -9,30 +9,32 @@ package Common{
 package InGame{
     package Roads{
         class Road{
-            +connectedJoints : Joint[]
+            +connectedJoints : RoadJoint[]
+            +length : float
+            +lanes : int
             -OptimizeArrangement() : void
             -GetJoints() : void
         }
 
-        class Joint{
+        class RoadJoint{
             +connectedRoads : Road[]
             +RegisterConnection() : void
         }
 
-        Road - Joint
+        Road - RoadJoint
 
         class Intersection{
             +allowedRoads : Road[]
             +ChangeAllowance() : void
         }
 
-        Joint <|-- Intersection
+        RoadJoint <|-- Intersection
 
         class OutsideConnection{
             +spawnPossibility : float
         }
 
-        Joint <|-- OutsideConnection
+        RoadJoint <|-- OutsideConnection
 
         class TrafficLight{
             -lightState : enum
