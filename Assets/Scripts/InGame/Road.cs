@@ -12,7 +12,15 @@ namespace InGame
         [Tooltip("両端に設置されている信号機。edgeObjectsと同じ順番で登録すること")]
         [SerializeField] private TrafficLight[] trafficLights;
 
+        /// <summary>
+        /// 両端に接続しているRoadJoint２つ。順番はedgeに対応
+        /// </summary>
         public RoadJoint[] connectedJoints { get; private set; } = new RoadJoint[2];
+
+        /// <summary>
+        /// 道路に接続済みか
+        /// </summary>
+        public bool isInitialized { get; private set; } = false;
 
         private void Start()
         {
@@ -45,6 +53,9 @@ namespace InGame
             //回転
             Quaternion rotation = Quaternion.FromToRotation(originalPath, optimizedPath);
             transform.rotation *= rotation;
+
+            //初期化済みに
+            isInitialized = true;
         }
 
         /// <summary>

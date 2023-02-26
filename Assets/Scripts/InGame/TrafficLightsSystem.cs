@@ -11,6 +11,14 @@ namespace InGame
 
         private Dictionary<Road, TrafficLight> correspondingTrafficLight = new Dictionary<Road, TrafficLight>();
 
+        public enum InitiallyGreen
+        {
+            odd,
+            even
+        }
+
+        [Tooltip("初期状態で緑信号になるもの")]
+        [SerializeField] private InitiallyGreen initiallyGreen = InitiallyGreen.even;
 
         /// <summary>
         /// 起動済みのTrafficLightを登録。各TrafficLightの初期化処理もする
@@ -27,6 +35,44 @@ namespace InGame
 
                 //Roadも登録
                 correspondingTrafficLight[roads[cnt]] = trafficLights[cnt];
+            }
+
+            //初期色をセット
+            SetInitialLight();
+        }
+
+        /// <summary>
+        /// TrafficLightの初期色をセット
+        /// 偶数あるいは奇数のTrafficLightを緑にし、残りを赤にする
+        /// </summary>
+        private void SetInitialLight()
+        {
+            for (int cnt = 0; cnt < trafficLights.Length; cnt++)
+            {
+                switch (initiallyGreen)
+                {
+                    case InitiallyGreen.even:
+                        if (cnt % 2 == 0)
+                        {
+                            trafficLights[cnt].SetLight(TrafficLight.Color.green);
+                        }
+                        else
+                        {
+                            trafficLights[cnt].SetLight(TrafficLight.Color.red);
+                        }
+                        break;
+
+                    case InitiallyGreen.odd:
+                        if (cnt % 2 == 0)
+                        {
+                            trafficLights[cnt].SetLight(TrafficLight.Color.green);
+                        }
+                        else
+                        {
+                            trafficLights[cnt].SetLight(TrafficLight.Color.red);
+                        }
+                        break;
+                }
             }
         }
     }

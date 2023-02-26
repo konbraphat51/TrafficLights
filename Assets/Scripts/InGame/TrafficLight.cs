@@ -6,5 +6,21 @@ namespace InGame
 {
     public class TrafficLight : MonoBehaviour
     {
+        public enum Color
+        {
+            green,
+            yellow,
+            red
+        }
+
+        public Color color { get; private set; }
+
+        /// <summary>
+        /// F‚ğØ‚è‘Ö‚¦
+        /// </summary>
+        public void SetLight(Color color)
+        {
+            this.color = color;
+        }
     }
 }
