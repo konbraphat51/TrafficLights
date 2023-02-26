@@ -10,9 +10,11 @@ package InGame{
     package Roads{
         class Road{
             +connectedJoints : RoadJoint[]
-            +length : float
-            +lanes : int
+            -length : float
+            -lanes : int
+            +cost : float
             -OptimizeArrangement() : void
+            -ModelizeCost() : float
             -GetJoints() : void
         }
 
