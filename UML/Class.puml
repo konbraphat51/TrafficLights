@@ -13,6 +13,7 @@ package InGame{
             -length : float
             -lanes : int
             +cost : float
+            -edgeTrafficLight : TrafficLight[]
             -OptimizeArrangement() : void
             -ModelizeCost() : float
             -GetJoints() : void
@@ -26,7 +27,7 @@ package InGame{
         Road - RoadJoint
 
         class Intersection{
-            +allowedRoads : Road[]
+            -trafficLightsSystem : TrafficLightsSystem
             +ChangeAllowance() : void
         }
 
@@ -38,14 +39,24 @@ package InGame{
 
         RoadJoint <|-- OutsideConnection
 
+        class TrafficLightsSystem{
+            -trafficLights : TrafficLight[]
+            +correspondingTrafficLight : Dictionary<Road, TrafficLight>
+            +ChangeDirection() : void
+            -GetTrafficLight : void
+        }
+
+        Intersection o-- TrafficLightsSystem
+
         class TrafficLight{
-            -lightState : enum
+            -lightColor : enum
             +ToggleLight() : void
         }
 
-        Intersection o-- TrafficLight
+        TrafficLightsSystem o-- TrafficLight
+        Road o-- TrafficLight
 
-        InputManager -- TrafficLight
+        InputManager -- TrafficLightsSystem
     }
     
     class Car{

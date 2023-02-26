@@ -9,6 +9,9 @@ namespace InGame
         [Tooltip("道路の両端の空オブジェクト")]
         [SerializeField] private GameObject[] edgeObjects;
 
+        [Tooltip("両端に設置されている信号機。edgeObjectsと同じ順番で登録すること")]
+        [SerializeField] private TrafficLight[] trafficLights;
+
         public RoadJoint[] connectedJoints { get; private set; } = new RoadJoint[2];
 
         private void Start()
@@ -56,6 +59,9 @@ namespace InGame
 
                 //最近傍を探して登録
                 connectedJoints[cnt] = GetNearestJoint(edgePosition);
+
+                //RoadJoint側にこちらを登録する
+                connectedJoints[cnt].RegisterRoad(this, cnt);
             }
         }
 
@@ -87,6 +93,20 @@ namespace InGame
             Debug.Assert(nearestJoint != null);
 
             return nearestJoint;
+        }
+
+        /// <summary>
+        /// 隠している信号機を起動
+        /// </summary>
+        /// <param name="side">道のどちらの端の信号機か</param>
+        /// <returns>起動した信号機の参照</returns>
+        public TrafficLight ActivateTrafficLight(int side)
+        {
+            //信号機を起動
+            trafficLights[side].gameObject.SetActive(true);
+
+            //信号機の参照を返す
+            return trafficLights[side];
         }
     }
 }
