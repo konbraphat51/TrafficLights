@@ -1,0 +1,14 @@
+@startuml
+
+[*] --> Initializing
+
+Initializing --> Still : 初期化処理完了
+
+Still -> YellowChanging : キー入力
+Still : 固定して緑・赤パターンを表示する
+Still : キー入力待ち
+
+YellowChanging -> Still : 黄色信号が終わり、次のパターンを表示
+YellowChanging : 黄色信号を表示して次のパターンに変わろうとしている
+
+@enduml
