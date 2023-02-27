@@ -1,0 +1,28 @@
+@startuml
+
+participant GameManager
+collections Roads
+collections Intersections
+collections TrafficLightsSystems
+
+Roads -> Intersections : 接続
+
+activate Intersections
+Intersections -> Roads : ActivateTrafficLight()
+activate Roads
+create collections TrafficLights
+Roads -> TrafficLights : 起動
+Roads -> Intersections : TrafficLightの参照を返す
+deactivate Roads
+deactivate Intersections
+
+GameManager -> Roads : 接続完了を確認
+activate Roads
+Roads -> GameManager : 接続完了！
+deactivate Roads
+
+GameManager -> TrafficLightsSystems : 初期化を命令
+hnote over TrafficLightsSystems : 初期化処理
+TrafficLightsSystems -> TrafficLights : 初期色をセット
+
+@enduml
