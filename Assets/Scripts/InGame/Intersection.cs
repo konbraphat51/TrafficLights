@@ -5,6 +5,10 @@ using System.Linq;
 
 namespace InGame
 {
+    /// <summary>
+    /// 交差点。
+    /// ３つ以上の道路をつなぐRoadJoint
+    /// </summary>
     public class Intersection : RoadJoint
     {
         [Tooltip("対応する信号機システム。nullなら信号機無しの交差点")]
@@ -48,7 +52,7 @@ namespace InGame
                 if (dif.y >= 0)
                 {
                     //RoadがIntersectionより上側にあるとき、０～１８０度になっているところに180度足す
-                    angles[road] = unsigned + 180f;
+                    angles[road] = 360f - unsigned;
                 }
                 else
                 {

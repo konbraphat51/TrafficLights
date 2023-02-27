@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace InGame
 {
+    /// <summary>
+    /// 外界との接続口。
+    /// 車がここからスポーン・デスポーンする
+    /// </summary>
     public class OutsideConnection : RoadJoint
     {
 

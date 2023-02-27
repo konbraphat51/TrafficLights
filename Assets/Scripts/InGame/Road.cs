@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace InGame
 {
+    /// <summary>
+    /// 道路。
+    /// 車がこの上を走る
+    /// 初期化処理として、自動的にRoadJointに接続する
+    /// </summary>
     public class Road : MonoBehaviour
     {
         [Tooltip("道路の両端の空オブジェクト")]
