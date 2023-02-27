@@ -18,6 +18,15 @@ namespace InGame
 
         private Dictionary<Road, TrafficLight> correspondingTrafficLight = new Dictionary<Road, TrafficLight>();
 
+        public enum States
+        {
+            initializing,
+            still,
+            yellowChanging
+        }
+
+        public States state { get; private set; } = States.initializing;
+
         /// <summary>
         /// 緑色になっている信号機の組み合わせ
         /// </summary>
@@ -33,7 +42,8 @@ namespace InGame
         //現在緑になっているパターン
         private GreenPattern currentPattern;
 
-        //黄色信号
+        [Tooltip("黄色信号になっている時間（秒）")]
+        [SerializeField] private float yellowTime = 1.5f;
 
         /// <summary>
         /// 起動済みのTrafficLightを登録。各TrafficLightの初期化処理もする
@@ -57,6 +67,9 @@ namespace InGame
 
             //初期色をセット
             SetInitialLight();
+
+            //初期化完了
+            state = States.still;
         }
 
         /// <summary>
@@ -65,36 +78,111 @@ namespace InGame
         /// </summary>
         private void SetInitialLight()
         {
+            //信号機の色をセット
+            SetLightsStill(initiallyGreen);
+
+            //パターンを記憶
+            currentPattern = initiallyGreen;
+        }
+
+        /// <summary>
+        /// Still状態（緑・赤）のパターンになるように信号機の色をセットする
+        /// </summary>
+        private void SetLightsStill(GreenPattern greenPattern)
+        {
+            //緑・赤信号を取得
+            TrafficLight[] greens = GetGreenLightsInPattern(greenPattern);
+            TrafficLight[] reds = GetRedLightsInPattern(greenPattern);
+
+            //緑信号をセット
+            foreach(TrafficLight light in greens)
+            {
+                light.SetLight(TrafficLight.Color.green);
+            }
+
+            //赤信号をセット
+            foreach(TrafficLight light in reds)
+            {
+                light.SetLight(TrafficLight.Color.red);
+            }
+        }
+
+        /// <summary>
+        /// YellowChanging状態（黄色・赤）のパターンになるように信号機の色をセットする
+        /// </summary>
+        private void SetLightsYellow(GreenPattern greenPattern)
+        {
+            //黄・赤信号を取得
+            //GreenPatternにおける緑を黄色にセットにすればいい
+            TrafficLight[] yellows = GetGreenLightsInPattern(greenPattern);
+            TrafficLight[] reds = GetRedLightsInPattern(greenPattern);
+
+            //黄信号をセット
+            foreach (TrafficLight light in yellows)
+            {
+                light.SetLight(TrafficLight.Color.yellow);
+            }
+
+            //赤信号をセット
+            foreach (TrafficLight light in reds)
+            {
+                light.SetLight(TrafficLight.Color.red);
+            }
+        }
+
+        /// <summary>
+        /// 与えられたパターンで緑信号になる信号を返す
+        /// </summary>
+        private TrafficLight[] GetGreenLightsInPattern(GreenPattern greenPattern)
+        {
+            List<TrafficLight> output = new List<TrafficLight>();
+
+            //線形探索
             for (int cnt = 0; cnt < trafficLights.Length; cnt++)
             {
-                switch (initiallyGreen)
+                switch (greenPattern)
                 {
                     case GreenPattern.even:
                         if (cnt % 2 == 0)
                         {
-                            trafficLights[cnt].SetLight(TrafficLight.Color.green);
-                        }
-                        else
-                        {
-                            trafficLights[cnt].SetLight(TrafficLight.Color.red);
+                            output.Add(trafficLights[cnt]);
                         }
                         break;
 
                     case GreenPattern.odd:
-                        if (cnt % 2 == 0)
+                        if (cnt % 2 == 1)
                         {
-                            trafficLights[cnt].SetLight(TrafficLight.Color.green);
-                        }
-                        else
-                        {
-                            trafficLights[cnt].SetLight(TrafficLight.Color.red);
+                            output.Add(trafficLights[cnt]);
                         }
                         break;
                 }
             }
 
-            //パターンを記憶
-            currentPattern = initiallyGreen;
+            return output.ToArray();
+        }
+
+        /// <summary>
+        /// 与えられたパターンで赤信号になる信号機を返す
+        /// </summary>
+        private TrafficLight[] GetRedLightsInPattern(GreenPattern greenPattern)
+        {
+            //緑信号を取得
+            TrafficLight[] green = GetGreenLightsInPattern(greenPattern);
+
+            //余事象（赤）を取得
+            List<TrafficLight> output = new List<TrafficLight>();
+            foreach(TrafficLight light in trafficLights)
+            {
+                if (!green.Contains(light))
+                {
+                    //>>緑信号ではない
+
+                    //登録
+                    output.Add(light);
+                }
+            }
+
+            return output.ToArray();
         }
 
         /// <summary>
@@ -102,7 +190,51 @@ namespace InGame
         /// </summary>
         public void ToggleLights()
         {
+            //Still状態じゃなければキャンセル
+            //黄色信号中に重複を受け付けない
+            if (state != States.still)
+            {
+                return;
+            }
 
+            //黄色信号を始める
+            StartYellow();
+
+            //信号切り替えを予約
+            Invoke(nameof(StartNextPatternLights), yellowTime);
+        }
+
+        /// <summary>
+        /// 黄色信号が終わり、次のパターンの信号を表示する
+        /// </summary>
+        public void StartNextPatternLights()
+        {
+            //ステート上のガード処理
+            if (state != States.yellowChanging)
+            {
+                return;
+            }
+
+            //次のパターンへ移る
+            currentPattern = GetNextPattern(currentPattern);
+
+            //そのパターンの緑赤信号を表示
+            SetLightsStill(currentPattern);
+
+            //緑赤ステートに
+            state = States.still;
+        }
+
+        /// <summary>
+        /// 黄色信号を始める
+        /// </summary>
+        private void StartYellow()
+        {
+            //黄色信号ステートに
+            state = States.yellowChanging;
+
+            //黄色信号に
+            SetLightsYellow(currentPattern);
         }
 
         /// <summary>
