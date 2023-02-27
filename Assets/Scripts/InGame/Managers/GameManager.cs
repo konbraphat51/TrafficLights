@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace InGame
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : SingletonMonoBehaviour<GameManager>
     {
         //‘STrafficLightsSystem‚ª‰Šú‰»Ï‚İ‚©
         private bool intersectionIsInitialized = false;
