@@ -259,14 +259,38 @@ MonoBehaviour:
   simpleActions:
   - _actions:
       m_PersistentCalls:
-        m_Calls: []
-    _keyName: 
-    _inputType: 0
+        m_Calls:
+        - m_Target: {fileID: 302083602}
+          m_TargetAssemblyTypeName: InGame.TrafficLightsSystem, Assembly-CSharp
+          m_MethodName: ToggleLights
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    _keyName: 1
+    _inputType: 1
   - _actions:
       m_PersistentCalls:
-        m_Calls: []
-    _keyName: 
-    _inputType: 0
+        m_Calls:
+        - m_Target: {fileID: 1822690849}
+          m_TargetAssemblyTypeName: InGame.TrafficLightsSystem, Assembly-CSharp
+          m_MethodName: ToggleLights
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    _keyName: 2
+    _inputType: 1
   severalPushesActions: []
   pushesInterval: 0.3
   buttonsInterpretations: []
@@ -285,6 +309,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &302083602 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 813223940680362911, guid: 774f7d239642c654dbf985b9a593c520, type: 3}
+  m_PrefabInstance: {fileID: 364588720}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7049fb3aefc60204ab2e452149dfcc91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &332845506
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1406,6 +1441,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4978375977625444418, guid: 33bc6a7ad7c83cd498a0825b74137cb1, type: 3}
   m_PrefabInstance: {fileID: 1769710779}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1822690849 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 813223940680362911, guid: 774f7d239642c654dbf985b9a593c520, type: 3}
+  m_PrefabInstance: {fileID: 343317516}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7049fb3aefc60204ab2e452149dfcc91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1851079930
 PrefabInstance:
   m_ObjectHideFlags: 0
