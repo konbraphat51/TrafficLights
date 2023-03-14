@@ -37,11 +37,12 @@ namespace InGame
 
             //>>全道路が接続済み
 
-            //全TrafficLightsSystemを初期化させる
-            Intersection[] allIntersections = FindObjectsOfType<Intersection>();
-            foreach(Intersection intersection in allIntersections) 
+            //全RoadJointsの時計回りソートを済ませる
+            //+全TrafficLightsSystemを初期化させる
+            RoadJoint[] allJoints = FindObjectsOfType<RoadJoint>();
+            foreach(RoadJoint roadJoint in allJoints) 
             {
-                intersection.InitializeTrafficLightSystem();
+                roadJoint.ArrangeRoadsClockwise();
             }
 
             //初期化済みに

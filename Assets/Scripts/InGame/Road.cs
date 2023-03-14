@@ -18,6 +18,11 @@ namespace InGame
         [SerializeField] private TrafficLight[] trafficLights;
 
         /// <summary>
+        /// 道沿いベクトル。0番目はedge0⇒edge1、1番目は反対
+        /// </summary>
+        public Vector2[] alongVectors { get; private set; } = new Vector2[2];
+
+        /// <summary>
         /// 両端に接続しているRoadJoint２つ。順番はedgeに対応
         /// </summary>
         public RoadJoint[] connectedJoints { get; private set; } = new RoadJoint[2];
@@ -31,6 +36,7 @@ namespace InGame
         {
             //配置最適化
             OptimizeArrangement();
+            GetVectors();
         }
 
         /// <summary>
@@ -61,6 +67,15 @@ namespace InGame
 
             //初期化済みに
             isInitialized = true;
+        }
+
+        /// <summary>
+        /// 道沿いベクトルをとる
+        /// </summary>
+        private void GetVectors()
+        {
+            alongVectors[0] = edgeObjects[1].transform.position - edgeObjects[0].transform.position;
+            alongVectors[1] = -alongVectors[0];
         }
 
         /// <summary>
