@@ -1,0 +1,15 @@
+@startuml
+
+[*] -> RunningRoad
+
+RunningRoad --> RunningJoint : 車線の終端まで到達
+
+RunningJoint : RoadJointをカーブしている
+
+RunningJoint -> RunningRoad : 次の道路まで到着
+
+RunningRoad -> ChangingLane : 車線変更開始
+
+ChangingLane -> RunningRoad : 車線変更完了
+
+@enduml

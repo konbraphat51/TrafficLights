@@ -7,22 +7,22 @@ namespace InGame
     public class GameManager : SingletonMonoBehaviour<GameManager>
     {
         //全TrafficLightsSystemが初期化済みか
-        private bool intersectionIsInitialized = false;
+        private bool afterConnectionInitialized = false;
 
         private void Update()
         {
             //TrafficLightsSystemを初期化
             //Start()に置くとRoad接続に先回りしてしまうためここに配置
-            if (!intersectionIsInitialized)
+            if (!afterConnectionInitialized)
             {
-                InitilizeTrafficLightsSystems();
+                InitilizeAfterRoadConnection();
             }
         }
 
         /// <summary>
-        /// 全道路が接続済みか確認して、接続済みなら全TrafficLightsSystemを初期化させる
+        /// 全道路が接続済みか確認して、その後に初期化が必要なオブジェクトを初期化させる
         /// </summary>
-        private void InitilizeTrafficLightsSystems()
+        private void InitilizeAfterRoadConnection()
         {
             //未接続の道路が存在していればキャンセル
             Road[] allRoads = FindObjectsOfType<Road>();
@@ -36,17 +36,29 @@ namespace InGame
             }
 
             //>>全道路が接続済み
+            
+            //交差点・信号機を初期化
+            InitializeIntersections();
 
+            //CarGeneratorを初期化
+            CarGenerator.Initialize();
+        }
+
+        /// <summary>
+        /// 全TrafficLightsSystemを初期化させる
+        /// </summary>
+        private void InitializeIntersections()
+        {
             //全RoadJointsの時計回りソートを済ませる
             //+全TrafficLightsSystemを初期化させる
             RoadJoint[] allJoints = FindObjectsOfType<RoadJoint>();
-            foreach(RoadJoint roadJoint in allJoints) 
+            foreach (RoadJoint roadJoint in allJoints)
             {
                 roadJoint.ArrangeRoadsClockwise();
             }
 
             //初期化済みに
-            intersectionIsInitialized = true;
+            afterConnectionInitialized = true;
         }
     }
 }
