@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace InGame
@@ -17,13 +18,63 @@ namespace InGame
         [Tooltip("両端に設置されている信号機。edgeObjectsと同じ順番で登録すること")]
         [SerializeField] private TrafficLight[] trafficLights;
 
+        [Tooltip("Edge0の開始位置外側（左側）車線からいれること")]
+        [SerializeField] private Transform[] _startingPoint0;
+        [Tooltip("Edge1の開始位置外側（左側）車線からいれること")]
+        [SerializeField] private Transform[] _startingPoint1;
+
+        /// <summary>
+        /// Edge0の開始位置。進行方向左側から順に
+        /// </summary>
+        public Vector2[] startingPoint0
+        {
+            get
+            {
+                Vector2[] output = new Vector2[_startingPoint0.Length];
+                for(int cnt = 0; cnt < _startingPoint0.Length; cnt++)
+                {
+                    output[cnt] = _startingPoint0[cnt].position;
+                }
+
+                return output;
+            }
+        }
+
+        /// <summary>
+        /// Edge1の開始位置。進行方向左側から順に
+        /// </summary>
+        public Vector2[] startingPoint1
+        {
+            get
+            {
+                Vector2[] output = new Vector2[_startingPoint1.Length];
+                for (int cnt = 0; cnt < _startingPoint1.Length; cnt++)
+                {
+                    output[cnt] = _startingPoint1[cnt].position;
+                }
+
+                return output;
+            }
+        }
+
+        /// <summary>
+        /// 片側車線数
+        /// </summary>
+        public uint lanes
+        {
+            get
+            {
+                return (uint)startingPoint0.Count();
+            }
+        }
+
         /// <summary>
         /// 道沿いベクトル。0番目はedge0⇒edge1、1番目は反対
         /// </summary>
         public Vector2[] alongVectors { get; private set; } = new Vector2[2];
 
         /// <summary>
-        /// 両端に接続しているRoadJoint２つ。順番はedgeに対応
+        /// 両端に接続しているRoadJoint２つ。順番はedgeに対応。0番目はedge0始点。
         /// </summary>
         public RoadJoint[] connectedJoints { get; private set; } = new RoadJoint[2];
 
@@ -138,6 +189,62 @@ namespace InGame
 
             //信号機の参照を返す
             return trafficLights[side];
+        }
+
+        /// <summary>
+        /// 与えられたroadについてjointと異なる端を返す
+        /// </summary>
+        public RoadJoint GetDiffrentEdge(RoadJoint joint)
+        {
+            //jointがroadのどちらかの端のはず
+            Debug.Assert(connectedJoints.Contains(joint));
+
+            if (connectedJoints[0] == joint)
+            {
+                return connectedJoints[1];
+            }
+            else
+            {
+                return connectedJoints[0];
+            }
+        }
+
+        /// <summary>
+        /// 与えられた端のedge番号を返す
+        /// </summary>
+        public uint GetEdgeNumber(RoadJoint edge)
+        {
+            if (connectedJoints[0] == edge)
+            {
+                return 0;
+            }
+            else if(connectedJoints[1] == edge)
+            {
+                return 1;
+            }
+            else
+            {
+                Debug.LogError("端じゃないRoadJointが渡された");
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// 開始位置を返す
+        /// </summary>
+        public Vector2 GetStartingPoint(uint edgeID, uint laneID)
+        {
+            Debug.Assert(edgeID < 2);
+            Debug.Assert(laneID < lanes);
+
+            if (edgeID == 0)
+            {
+                return startingPoint0[laneID];
+            }
+            else
+            {
+                return startingPoint1[laneID];
+            }
         }
     }
 }
