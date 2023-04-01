@@ -69,7 +69,7 @@ namespace InGame
                 foreach(Road road in outsideConnection.connectedRoads)
                 {
                     //‚±‚ÌOutsideConnection‚Ìedge”Ô†
-                    uint edge = road.GetEdgeNumber(outsideConnection);
+                    uint edge = road.GetEdgeID(outsideConnection);
 
                     //ŠeÔü‚É‚Â‚¢‚Ä
                     for (uint lane = 0; lane < road.lanes; lane++)
