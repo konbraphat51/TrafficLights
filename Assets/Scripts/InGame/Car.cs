@@ -185,19 +185,25 @@ namespace InGame
             //現在位置を道路に開始位置に調整
             AdjustStartingPositionInRoad(road, laneID, edgeID, first);
 
-            //開始位置時点での走行距離
-            currentDistanceInRoad = Vector3.Distance(transform.position, road.GetStartingPoint(edgeID, laneID));
+            //現在の行き先の座標
+            Vector2 destinationPoint;
 
             //次のJoint回転を計算
             if (TryGetNextCurveRoute(road.GetDiffrentEdge(startingJoint))){
                 //次のJoint移動がある場合、回転開始位置までrunningRoad
-                targetDistanceInRoad = Vector3.Distance(road.GetStartingPoint(edgeID, laneID), currentCurveRoute.startingPoint);
+                destinationPoint = currentCurveRoute.startingPoint;
             }
             else
             {
-                //次のJoint移動がない場合、Jointまで走る
-                targetDistanceInRoad = currentAlongRoad.magnitude;
+                //次のJoint移動がない場合（終点の場合）、Jointまで走る
+                destinationPoint = road.GetDiffrentEdge(startingJoint).transform.position;
             }
+
+            //目標走行距離
+            targetDistanceInRoad = Vector2.Distance(road.GetStartingPoint(edgeID, laneID), destinationPoint);
+
+            //開始位置時点での走行距離
+            currentDistanceInRoad = targetDistanceInRoad - Vector2.Distance(transform.position, destinationPoint);
 
             //ステートを変更
             state = State.runningRoad;
@@ -300,8 +306,18 @@ namespace InGame
             //終端を通り過ぎたか確認
             if (currentDistanceInRoad >= targetDistanceInRoad)
             {
-                //Joint回転モードに入る
-                StartRunningJoint();
+                if(routes.Count > 0)
+                {
+                    //>>まだ終点まで来ていない
+                    //Joint回転モードに入る
+                    StartRunningJoint();
+                }
+                else
+                {
+                    //>>終点まで来た
+                    //到着時処理
+                    OnArrivedDestination();
+                }
             }
         }
 
@@ -400,6 +416,15 @@ namespace InGame
                     return (currentAngle >= currentCurveRoute.endingAngle + 360);
                 }
             }
+        }
+
+        /// <summary>
+        /// 目的地に到着して、消えてGameManagerに報告
+        /// </summary>
+        private void OnArrivedDestination()
+        {
+            //消える
+            Destroy(this.gameObject);
         }
 
         private float GetSpeedInJoint()
