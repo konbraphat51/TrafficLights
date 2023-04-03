@@ -42,6 +42,9 @@ namespace InGame
 
             //CarGenerator‚ğ‰Šú‰»
             CarGenerator.Initialize();
+
+            //Navigator‚ğ‰Šú‰»
+            Navigator.Instance.SetUp();
         }
 
         /// <summary>
