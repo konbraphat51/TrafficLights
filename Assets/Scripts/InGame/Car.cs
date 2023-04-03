@@ -118,7 +118,7 @@ namespace InGame
             }
 
             //初期道路は確定しているので、その次のjointからのルートを得る
-            this.routes = GetRoute(spawnRoad.GetDiffrentEdge(spawnPoint), destination);
+            this.routes = GetRoute(spawnRoad.GetDiffrentEdge(spawnPoint), this.destination);
 
             //走り始める
             StartRunningRoad(spawnRoad, spawnLane, spawnPoint, true);
@@ -156,22 +156,17 @@ namespace InGame
         /// <returns></returns>
         private Queue<Road> GetRoute(RoadJoint startingPoint, RoadJoint target)
         {
-            //TODO
-            Queue<Road> output = new Queue<Road>();
+            //Navigatorよりルートを取得
+            Road[] routeArray = Navigator.Instance.GetRoute(startingPoint, target);
 
-            Road nextRoad;
-            while (true)
+            //キューに直す
+            Queue<Road> routeQueue = new Queue<Road>();
+            foreach(Road road in routeArray)
             {
-                nextRoad = startingPoint.connectedRoads[Random.Range(0, startingPoint.connectedRoads.Count)];
-                if (nextRoad != currentRoad)
-                {
-                    break;
-                }
+                routeQueue.Enqueue(road);
             }
 
-            output.Enqueue(nextRoad);
-
-            return output;
+            return routeQueue;
         }
 
         /// <summary>

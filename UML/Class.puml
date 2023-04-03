@@ -79,6 +79,14 @@ package InGame{
     CarGenerator --> Car
     CarGenerator --> OutsideConnection
 
+    class Navigator{
+        -adjacency : float[,]
+        +SetUp() : void
+        +GetRoute() : List<Road>
+    }
+
+    Car -> Navigator    
+
     package Managers{
         class UIManagerInGame{
             -UpdateUIs() : void
@@ -90,6 +98,9 @@ package InGame{
             +timeLeft : float
             +AddPoint() : void
         }
+
+        GameManagerInGame --> RoadJoint
+        GameManagerInGame --> Navigator
     }
 }
 
