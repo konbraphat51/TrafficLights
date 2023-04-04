@@ -99,8 +99,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 1
   angularSpeed: 90
-  angularSpeedChangingLane: 20
+  angularSpeedChangingLane: 40
   roadsParallelThreshold: 10
-  thresholdRadiusChangingLane: 5
-  angleMaxChangingLane: 30
+  thresholdRadiusChangingLane: 1
+  angleMaxChangingLane: 40
   parallelThresholdChangingLane: 3
+  onSameLineThreshold: 0.1

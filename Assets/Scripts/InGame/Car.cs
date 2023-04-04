@@ -120,11 +120,6 @@ namespace InGame
         private bool changingLaneRotating = false;
 
         /// <summary>
-        /// 車線変更終了フラグ
-        /// </summary>
-        private bool changingLaneFinished = false;
-
-        /// <summary>
         /// 車線変更時の円弧軌道
         /// </summary>
         private CurveRoute curveChangingLane;
@@ -553,8 +548,14 @@ namespace InGame
             //進行方向と車線方向の角の二等分線ベクトル
             Vector2 bisector = GetBisector(-front, nextVector);
 
+            //進行方向と車線の交点
+            Vector2 intersection = GetIntersection(transform.position, front, nextLaneStartingPoint, nextVector);
+
             //回転中心の座標
-            Vector2 rotationCenter = GetIntersection(transform.position, perpendicularFromAhead, nextLaneStartingPoint, bisector);
+            Vector2 rotationCenter = GetIntersection(transform.position, perpendicularFromAhead, intersection, bisector);
+
+            GameObject a = new GameObject();
+            a.transform.position = rotationCenter;
 
             //回転半径
             float radius = Vector2.Distance(rotationCenter, transform.position);
@@ -571,12 +572,12 @@ namespace InGame
                 if (angularDiference < 180f)
                 {
                     //反時計回り
-                    clockwise = true;
+                    clockwise = false;
                 }
                 else
                 {
                     //時計回り
-                    clockwise = false;
+                    clockwise = true;
                 }
 
                 //カーブの始点・終点を求める
