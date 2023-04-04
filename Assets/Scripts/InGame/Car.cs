@@ -5,6 +5,8 @@ namespace InGame
 {
     public class Car : MonoBehaviour
     {
+        [Header("速度関係")]
+
         [Tooltip("スピード")]
         [SerializeField] private float speed = 5f;
 
@@ -99,6 +101,8 @@ namespace InGame
             }
         }
 
+        [Header("車線変更")]
+
         [Tooltip("道路の角度（度）がこれ以下なら平行とみなす")]
         [SerializeField] private float roadsParallelThreshold = 10f;
 
@@ -111,6 +115,20 @@ namespace InGame
         [Tooltip("車線変更時、道路との角度がこれ以下になったら道路と平行とみなす")]
         [SerializeField] private float parallelThresholdChangingLane = 3f;
 
+        [Header("センシング")]
+        [Tooltip("検出ビーム始点")]
+        [SerializeField] private Transform detectionRayStart;
+
+        [Tooltip("検出ビーム終点・前")]
+        [SerializeField] private Transform[] detectionRayDestinationFront;
+
+        [Tooltip("検出ビーム終点・左")]
+        [SerializeField] private Transform[] detectionRayDestinationLeft;
+
+        [Tooltip("検出ビーム終点・右")]
+        [SerializeField] private Transform[] detectionRayDestinationRight;
+
+        [Header("その他")]
         [Tooltip("同一直線上と判断する外積の閾値")]
         [SerializeField] private float onSameLineThreshold = 0.05f;
 
