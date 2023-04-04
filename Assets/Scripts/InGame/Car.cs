@@ -111,6 +111,9 @@ namespace InGame
         [Tooltip("車線変更時、道路との角度がこれ以下になったら道路と平行とみなす")]
         [SerializeField] private float parallelThresholdChangingLane = 3f;
 
+        [Tooltip("同一直線上と判断する外積の閾値")]
+        [SerializeField] private float onSameLineThreshold = 0.05f;
+
         /// <summary>
         /// 車線変更でカーブモードに入った
         /// </summary>
@@ -454,7 +457,7 @@ namespace InGame
             }
 
             //回転
-            currentAngle += GetSpeedInJoint() * coef * Time.deltaTime;
+            currentAngle += GetAngularSpeedInJoint() * coef * Time.deltaTime;
 
             //座標
             transform.position = GetPositionFromPolar(currentCurveRoute.center, currentCurveRoute.radius, currentAngle);
@@ -476,7 +479,15 @@ namespace InGame
         /// </summary>
         private void StartChangingLane()
         {
+            //CheckChangingLaneNecessary()より前に呼ぶ必要がある
             GetNextLane();
+
+            //車線変更の必要がないか確認
+            if (CheckChangingLaneNecessary())
+            {
+                StartRunningRoad(routes.Dequeue(), nextLaneID, nextRoadJoint);
+                return;
+            }
 
             changingLaneRotating = false;
             curveChangingLane = new CurveRoute();
@@ -509,6 +520,19 @@ namespace InGame
                 //前進しながら曲がる
                 ChangeLaneForward(nextLaneStartingPoint, nextVector);
             }
+        }
+
+        /// <summary>
+        /// 車線変更が必要か確認する
+        /// </summary>
+        private bool CheckChangingLaneNecessary()
+        {
+            Road nextRoad = routes.Peek();
+            uint edgeID = nextRoad.GetEdgeID(nextRoadJoint);
+
+            return CheckInLine((Vector2)transform.position,
+                (Vector2)nextRoad.GetStartingPoint(edgeID, nextLaneID),
+                (Vector2)nextRoad.alongVectors[edgeID]);
         }
 
         /// <summary>
@@ -657,7 +681,11 @@ namespace InGame
             Destroy(this.gameObject);
         }
 
-        private float GetSpeedInJoint()
+        /// <summary>
+        /// Joint回転中の角速度
+        /// </summary>
+        /// <returns></returns>
+        private float GetAngularSpeedInJoint()
         {
             return angularSpeed;
         }
@@ -814,7 +842,7 @@ namespace InGame
         /// <summary>
         /// 点が直線上にあるか判定する
         /// </summary>
-        private static bool CheckInLine(Vector3 point, Vector3 linePoint, Vector3 lineVector)
+        private bool CheckInLine(Vector3 point, Vector3 linePoint, Vector3 lineVector)
         {
             Vector3 difference = point - linePoint;
 
@@ -822,7 +850,7 @@ namespace InGame
             float outer = Vector3.Cross(lineVector, difference).magnitude;
 
             //0なら直線上
-            return Mathf.Approximately(outer, 0f);
+            return IsSame(outer, 0f, onSameLineThreshold);
         }
 
         /// <summary>
@@ -850,6 +878,14 @@ namespace InGame
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// 誤差を許して同一値を返す
+        /// </summary>
+        private bool IsSame(float v0, float v1, float threshold)
+        {
+            return (Mathf.Abs(v0 - v1) <= threshold);
         }
 
         /// <summary>
