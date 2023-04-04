@@ -52,19 +52,7 @@ namespace InGame
                 //RoadとIntersectionの差ベクトル
                 Vector3 dif = road.transform.position - transform.position;
 
-                //x軸正方向との符号がついていない角度（ベクトルのなす角）
-                float unsigned = Vector2.Angle(new Vector2(1, 0), dif);
-
-                if (dif.y >= 0)
-                {
-                    //RoadがIntersectionより上側にあるとき、０～１８０度になっているところに180度足す
-                    angles[road] = 360f - unsigned;
-                }
-                else
-                {
-                    //下にある場合はそのまま
-                    angles[road] = unsigned;
-                }
+                angles[road] = MyMath.GetAngular(dif);
             }
 
             //角度が小さい順に並び替え
