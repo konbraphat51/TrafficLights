@@ -560,8 +560,8 @@ namespace InGame
                 Vector2 endingPoint = GetFootOfPerpendicular(rotationCenter, nextLaneStartingPoint, nextVector);
 
                 //角度を求める
-                float startingAngle = Quaternion.FromToRotation(Vector2.right, startingPoint - rotationCenter).eulerAngles.z;
-                float endingAngle = Quaternion.FromToRotation(Vector2.right, endingPoint - rotationCenter).eulerAngles.z;
+                float startingAngle = GetAngular(startingPoint - rotationCenter);
+                float endingAngle = GetAngular(endingPoint - rotationCenter);
 
                 //軌道の保存
                 curveChangingLane.center = rotationCenter;
@@ -751,8 +751,8 @@ namespace InGame
             output.radius = Vector2.Distance(startingPoint, output.center);
 
             //角度を求める
-            output.startingAngle = Quaternion.FromToRotation(Vector2.right, startingPoint - output.center).eulerAngles.z;
-            output.endingAngle = Quaternion.FromToRotation(Vector2.right, endingPoint - output.center).eulerAngles.z;
+            output.startingAngle = GetAngular(startingPoint - output.center);
+            output.endingAngle = GetAngular(endingPoint - output.center);
 
             return output;
         }
@@ -936,7 +936,28 @@ namespace InGame
                     return (currentAngle >= curveRoute.endingAngle + 360);
                 }
             }
-            
+        }
+
+        /// <summary>
+        /// ベクトルのｘ軸正からの反時計回りの角度(0-360)を算出
+        /// </summary>
+        /// <returns></returns>
+        private float GetAngular(Vector2 vector)
+        {
+            Quaternion q = Quaternion.FromToRotation(Vector2.right, vector);
+
+            float z = q.eulerAngles.z;
+
+            if (Mathf.Approximately(z, 0f))
+            {
+                //180度回転の場合、x, y回転とみなされてzが０になっている可能性がある
+                if ((q.eulerAngles.x > 90f) || (q.eulerAngles.y > 90f))
+                {
+                    z = 180f;
+                }
+            }
+
+            return z;
         }
 
         /// <summary>
