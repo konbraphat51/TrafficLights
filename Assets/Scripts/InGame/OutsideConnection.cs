@@ -10,5 +10,6 @@ namespace InGame
     /// </summary>
     public class OutsideConnection : RoadJoint
     {
+        
     }
 }

@@ -285,10 +285,10 @@ namespace InGame
         private void AdjustStartingPositionInRoad(Road road, uint laneID, uint edgeID, bool first)
         {
             //座標
-            if (!CheckInLine(transform.position, road.GetStartingPoint(edgeID, laneID), road.alongVectors[edgeID]))
+            if (!MyMath.CheckOnLine(transform.position, road.GetStartingPoint(edgeID, laneID), road.alongVectors[edgeID], onSameLineThreshold))
             {
                 //直線状無い場合は垂線の足へ調整
-                transform.position = GetFootOfPerpendicular(transform.position, road.GetStartingPoint(edgeID, laneID), road.alongVectors[edgeID]);
+                transform.position = MyMath.GetFootOfPerpendicular(transform.position, road.GetStartingPoint(edgeID, laneID), road.alongVectors[edgeID]);
             }
 
             //初回の場合、座標を合わせる
@@ -298,7 +298,7 @@ namespace InGame
             }
 
             //回転
-            transform.rotation = GetRotatoinInRoad(road.alongVectors[edgeID]);
+            transform.rotation = Quaternion.Euler(0,0,GetRotatoinInRoad(road.alongVectors[edgeID]));
         }
 
         /// <summary>
@@ -311,7 +311,7 @@ namespace InGame
             Road nextRoad = routes.Peek();
 
             //次と平行
-            if (IsParallel(currentRoad.alongVectors[0], nextRoad.alongVectors[0], roadsParallelThreshold))
+            if (MyMath.IsParallel(currentRoad.alongVectors[0], nextRoad.alongVectors[0], roadsParallelThreshold))
             {
                 return false;
             }
@@ -455,7 +455,7 @@ namespace InGame
             currentAngle += GetAngularSpeedInJoint() * coef * Time.deltaTime;
 
             //座標
-            transform.position = GetPositionFromPolar(currentCurveRoute.center, currentCurveRoute.radius, currentAngle);
+            transform.position = MyMath.GetPositionFromPolar(currentCurveRoute.center, currentCurveRoute.radius, currentAngle);
 
             //回転
             transform.rotation = GetRotationInJoint(currentAngle, currentCurveRoute.clockwise);
@@ -525,9 +525,10 @@ namespace InGame
             Road nextRoad = routes.Peek();
             uint edgeID = nextRoad.GetEdgeID(nextRoadJoint);
 
-            return CheckInLine((Vector2)transform.position,
+            return MyMath.CheckOnLine((Vector2)transform.position,
                 (Vector2)nextRoad.GetStartingPoint(edgeID, nextLaneID),
-                (Vector2)nextRoad.alongVectors[edgeID]);
+                (Vector2)nextRoad.alongVectors[edgeID],
+                onSameLineThreshold);
         }
 
         /// <summary>
@@ -536,23 +537,23 @@ namespace InGame
         private bool TryMakeCurveChangingLane(Vector2 nextLaneStartingPoint, Vector2 nextVector)
         {
             //平行ならfalse
-            if(IsParallel(nextVector, front, parallelThresholdChangingLane))
+            if(MyMath.IsParallel(nextVector, front, parallelThresholdChangingLane))
             {
                 return false;
             }
 
             //>>回転移動すると仮定したときの半径・中心を求める
             //現在の進行方向の法線ベクトル
-            Vector2 perpendicularFromAhead = GetPerpendicular(front);
+            Vector2 perpendicularFromAhead = MyMath.GetPerpendicular(front);
 
             //進行方向と車線方向の角の二等分線ベクトル
-            Vector2 bisector = GetBisector(-front, nextVector);
+            Vector2 bisector = MyMath.GetBisector(-front, nextVector);
 
             //進行方向と車線の交点
-            Vector2 intersection = GetIntersection(transform.position, front, nextLaneStartingPoint, nextVector);
+            Vector2 intersection = MyMath.GetIntersection(transform.position, front, nextLaneStartingPoint, nextVector);
 
             //回転中心の座標
-            Vector2 rotationCenter = GetIntersection(transform.position, perpendicularFromAhead, intersection, bisector);
+            Vector2 rotationCenter = MyMath.GetIntersection(transform.position, perpendicularFromAhead, intersection, bisector);
 
             GameObject a = new GameObject();
             a.transform.position = rotationCenter;
@@ -567,7 +568,7 @@ namespace InGame
 
                 //>>回転軌道の具体化
                 //回転方向を算出
-                float angularDiference = Quaternion.FromToRotation(front, nextVector).eulerAngles.z;
+                float angularDiference = MyMath.GetAngularDifference(front, nextVector);
                 bool clockwise;
                 if (angularDiference < 180f)
                 {
@@ -582,11 +583,11 @@ namespace InGame
 
                 //カーブの始点・終点を求める
                 Vector2 startingPoint = transform.position;
-                Vector2 endingPoint = GetFootOfPerpendicular(rotationCenter, nextLaneStartingPoint, nextVector);
+                Vector2 endingPoint = MyMath.GetFootOfPerpendicular(rotationCenter, nextLaneStartingPoint, nextVector);
 
                 //角度を求める
-                float startingAngle = GetAngular(startingPoint - rotationCenter);
-                float endingAngle = GetAngular(endingPoint - rotationCenter);
+                float startingAngle = MyMath.GetAngular(startingPoint - rotationCenter);
+                float endingAngle = MyMath.GetAngular(endingPoint - rotationCenter);
 
                 //軌道の保存
                 curveChangingLane.center = rotationCenter;
@@ -623,7 +624,7 @@ namespace InGame
                 //>>行き過ぎたので車線方向へ戻す
 
                 //座標
-                transform.position = GetPositionFromPolar(curve.center, curve.radius, curve.endingAngle);
+                transform.position = MyMath.GetPositionFromPolar(curve.center, curve.radius, curve.endingAngle);
 
                 //回転
                 transform.rotation = GetRotationInJoint(curve.endingAngle, curve.clockwise);
@@ -634,7 +635,7 @@ namespace InGame
             else
             {
                 //座標
-                transform.position = GetPositionFromPolar(curve.center, curve.radius, currentAngle);
+                transform.position = MyMath.GetPositionFromPolar(curve.center, curve.radius, currentAngle);
 
                 //回転
                 transform.rotation = GetRotationInJoint(currentAngle, curve.clockwise);
@@ -647,7 +648,7 @@ namespace InGame
         private void ChangeLaneForward(Vector2 targetLanePoint, Vector2 targetLaneVector)
         {
             //曲がる方向を算出
-            bool shouldTurnRight = !IsRightFromVector(transform.position, targetLanePoint, targetLaneVector);
+            bool shouldTurnRight = !MyMath.IsRightFromVector(transform.position, targetLanePoint, targetLaneVector);
 
             //進行方向に対する車線の角度
             float angularDifference = Vector2.Angle(front, targetLaneVector);
@@ -694,9 +695,9 @@ namespace InGame
         /// <summary>
         /// RunRoad時の回転を返す
         /// </summary>
-        private static Quaternion GetRotatoinInRoad(Vector2 alongVector)
+        private float GetRotatoinInRoad(Vector2 alongVector)
         {
-            return Quaternion.FromToRotation(Vector3.right, alongVector);
+            return MyMath.GetAngular(alongVector);
         }
 
         /// <summary>
@@ -723,7 +724,7 @@ namespace InGame
             //>>時計回りかを取得
             Vector2 startingAlongVector = startingRoad.alongVectors[Road.GetDifferentEdgeID(startingEdgeID)];
             Vector2 endingAlongVector = endingRoad.alongVectors[endingEdgeID];
-            float angularDiference = Quaternion.FromToRotation(startingAlongVector, endingAlongVector).eulerAngles.z;
+            float angularDiference = MyMath.GetAngularDifference(startingAlongVector, endingAlongVector);
             if (angularDiference < 180f)
             {
                 //反時計回り
@@ -770,42 +771,20 @@ namespace InGame
             }
 
             //交点を求める
-            output.center = GetIntersection(startingRoadSideLinePoint, startingRoadSideLineVector, endingRoadSideLinePoint, endingRoadSideLineVector);
+            output.center = MyMath.GetIntersection(startingRoadSideLinePoint, startingRoadSideLineVector, endingRoadSideLinePoint, endingRoadSideLineVector);
 
             //カーブの始点・終点を求める
-            Vector2 startingPoint = GetFootOfPerpendicular(output.center, startingRoad.GetStartingPoint(Road.GetDifferentEdgeID(startingEdgeID), startingLaneID), startingRoad.alongVectors[Road.GetDifferentEdgeID(startingEdgeID)]);
-            Vector2 endingPoint = GetFootOfPerpendicular(output.center, endingRoad.GetStartingPoint(endingEdgeID, endingLaneID), endingRoad.alongVectors[endingEdgeID]);
+            Vector2 startingPoint = MyMath.GetFootOfPerpendicular(output.center, startingRoad.GetStartingPoint(Road.GetDifferentEdgeID(startingEdgeID), startingLaneID), startingRoad.alongVectors[Road.GetDifferentEdgeID(startingEdgeID)]);
+            Vector2 endingPoint = MyMath.GetFootOfPerpendicular(output.center, endingRoad.GetStartingPoint(endingEdgeID, endingLaneID), endingRoad.alongVectors[endingEdgeID]);
 
             //半径を求める
             output.radius = Vector2.Distance(startingPoint, output.center);
 
             //角度を求める
-            output.startingAngle = GetAngular(startingPoint - output.center);
-            output.endingAngle = GetAngular(endingPoint - output.center);
+            output.startingAngle = MyMath.GetAngular(startingPoint - output.center);
+            output.endingAngle = MyMath.GetAngular(endingPoint - output.center);
 
             return output;
-        }
-
-        /// <summary>
-        /// 二つの線分の交点を求める
-        /// </summary>
-        private static Vector2 GetIntersection(Vector2 line0Point, Vector2 line0Vector, Vector2 line1Point, Vector2 line1Vector)
-        {
-            // 外積を求める
-            float cross = line0Vector.x * line1Vector.y - line0Vector.y * line1Vector.x;
-
-            // 線分が平行である場合
-            if (Mathf.Approximately(cross, 0f))
-            {
-                Debug.LogError("平行");
-                return Vector2.zero;
-            }
-
-            // 交点を求める
-            float t = ((line1Point.x - line0Point.x) * line1Vector.y - (line1Point.y - line0Point.y) * line1Vector.x) / cross;
-            Vector2 intersectionPoint = line0Point + line0Vector * t;
-
-            return intersectionPoint;
         }
 
         /// <summary>
@@ -826,118 +805,6 @@ namespace InGame
             }
 
             return Quaternion.Euler(0f, 0f, angleInCurve + addition);
-        }
-
-        /// <summary>
-        /// 垂線の足を求める
-        /// </summary>
-        private static Vector2 GetFootOfPerpendicular(Vector2 point, Vector2 linePoint, Vector2 lineVector)
-        {
-            Vector2 v = point - linePoint;
-            float t = Vector2.Dot(v, lineVector) / lineVector.sqrMagnitude;
-            Vector2 foot = linePoint + lineVector * t;
-
-            return foot;
-        }
-
-        /// <summary>
-        /// 点が直線上にあるか判定する
-        /// </summary>
-        private bool CheckInLine(Vector3 point, Vector3 linePoint, Vector3 lineVector)
-        {
-            Vector3 difference = point - linePoint;
-
-            //外積の大きさを求める
-            float outer = Vector3.Cross(lineVector, difference).magnitude;
-
-            //0なら直線上
-            return IsSame(outer, 0f, onSameLineThreshold);
-        }
-
-        /// <summary>
-        /// 極座標から平面座標に変換
-        /// </summary>
-        private static Vector2 GetPositionFromPolar(Vector2 pole, float radius, float angular)
-        {
-            return pole + (Vector2)(Quaternion.Euler(0f, 0f, angular) * Vector2.right) * radius;
-        }
-
-        /// <summary>
-        /// 二つのベクトルが平行か（閾値以下）か返す
-        /// </summary>
-        private bool IsParallel(Vector2 vec0, Vector2 vec1, float threshold)
-        {
-            
-            float angle = Vector2.Angle(vec0, vec1);
-
-            if((angle <= threshold)
-                ||(Mathf.Abs(angle -180f) <= threshold)
-                ||(Mathf.Abs(angle -360f) <= threshold)){
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 誤差を許して同一値を返す
-        /// </summary>
-        private bool IsSame(float v0, float v1, float threshold)
-        {
-            return (Mathf.Abs(v0 - v1) <= threshold);
-        }
-
-        /// <summary>
-        /// 点と直線の距離を求める
-        /// </summary>
-        private static float GetDistance(Vector2 point, Vector2 linePoint, Vector2 lineVector)
-        {
-            //pointの相対座標
-            Vector2 pointToLineStart = point - linePoint;
-
-            //pointからの正射影点
-            float dotProduct = Vector2.Dot(pointToLineStart, lineVector);
-            Vector2 projection = linePoint + lineVector * dotProduct;
-
-            //相対座標と正射影点の距離を求めれば良い
-            return Vector2.Distance(point, projection);
-        }
-
-        /// <summary>
-        /// 法線ベクトルを求める
-        /// </summary>
-        private static Vector2 GetPerpendicular(Vector2 vec)
-        {
-            return new Vector2(vec.y, -vec.x);
-        }
-
-        private static Vector2 GetBisector(Vector2 vec0, Vector2 vec1)
-        {
-            Vector2 u0 = vec0.normalized;
-            Vector2 u1 = vec1.normalized;
-
-            return (u0 + u1).normalized;
-        }
-
-        /// <summary>
-        /// 与えられたベクトルに対し、与えられた点が右にあるかを返す
-        /// </summary>
-        private static bool IsRightFromVector(Vector2 point, Vector2 linePoint, Vector2 lineVector)
-        {
-            float angularDiference = Quaternion.FromToRotation(lineVector, point-linePoint).eulerAngles.z;
-
-            if (angularDiference < 180f)
-            {
-                //左にある
-                return false;
-            }
-            else
-            {
-                //右にある
-                return true;
-            }
         }
 
         /// <summary>
@@ -973,28 +840,6 @@ namespace InGame
                     return (currentAngle >= curveRoute.endingAngle + 360);
                 }
             }
-        }
-
-        /// <summary>
-        /// ベクトルのｘ軸正からの反時計回りの角度(0-360)を算出
-        /// </summary>
-        /// <returns></returns>
-        private float GetAngular(Vector2 vector)
-        {
-            Quaternion q = Quaternion.FromToRotation(Vector2.right, vector);
-
-            float z = q.eulerAngles.z;
-
-            if (Mathf.Approximately(z, 0f))
-            {
-                //180度回転の場合、x, y回転とみなされてzが０になっている可能性がある
-                if ((q.eulerAngles.x > 90f) || (q.eulerAngles.y > 90f))
-                {
-                    z = 180f;
-                }
-            }
-
-            return z;
         }
 
         /// <summary>
@@ -1036,7 +881,7 @@ namespace InGame
             {
                 get
                 {
-                    return GetPositionFromPolar(center, radius, startingAngle);
+                    return MyMath.GetPositionFromPolar(center, radius, startingAngle);
                 }
             }
 
@@ -1044,7 +889,7 @@ namespace InGame
             {
                 get
                 {
-                    return GetPositionFromPolar(center, radius, endingAngle);
+                    return MyMath.GetPositionFromPolar(center, radius, endingAngle);
                 }
             }
         }

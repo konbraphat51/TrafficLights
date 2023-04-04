@@ -51,9 +51,6 @@ namespace InGame
         /// <param name="roads">時計回りに登録すること</param>
         public void RegisterTrafficLights(Road[] roads, Dictionary<Road, int> edges)
         {
-            //5個以上の信号機には対応できない
-            Debug.Assert(roads.Length < 5);
-
             //時計回り順にTrafficLightを起動・登録
             trafficLights = new TrafficLight[roads.Length];
             for(int cnt = 0; cnt < roads.Length; cnt++)
@@ -65,11 +62,28 @@ namespace InGame
                 correspondingTrafficLight[roads[cnt]] = trafficLights[cnt];
             }
 
+            //並び替え
+            trafficLights = RearrangeLight(trafficLights);
+
             //初期色をセット
             SetInitialLight();
 
             //初期化完了
             state = States.still;
+        }
+
+        /// <summary>
+        /// 信号の数にあわせて配列内の信号の順番をずらす
+        /// </summary>
+        private TrafficLight[] RearrangeLight(TrafficLight[] trafficLights)
+        {
+            //n->n+1の間の角
+            float[] angles = new float[trafficLights.Length];
+
+            for(int cnt = 0; cnt < trafficLights.Length; cnt++)
+            {
+                
+            }
         }
 
         /// <summary>
