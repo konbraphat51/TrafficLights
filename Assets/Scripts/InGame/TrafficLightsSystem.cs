@@ -77,13 +77,52 @@ namespace InGame
         /// </summary>
         private TrafficLight[] RearrangeLight(TrafficLight[] trafficLights)
         {
-            //n->n+1‚ÌŠÔ‚ÌŠp
-            float[] angles = new float[trafficLights.Length];
+            TrafficLight[] newArray = new TrafficLight[trafficLights.Length];
 
+            //n”Ô–Ú‚Ì•ûˆÊŠp
+            float[] angles = new float[trafficLights.Length];
             for(int cnt = 0; cnt < trafficLights.Length; cnt++)
             {
-                
+                angles[cnt] = MyMath.GetAngular(trafficLights[cnt].transform.position - transform.position);
             }
+
+            //n -> n+1 ‚ÌŠp“x·
+            float[] angularDifferences = new float[trafficLights.Length];
+            for(int cnt = 0; cnt < trafficLights.Length -1; cnt++)
+            {
+                angularDifferences[cnt] = angles[cnt+1] - angles[cnt];
+            }
+            angularDifferences[trafficLights.Length - 1] = (angles[0] + 360) - angles[trafficLights.Length - 1];
+
+            //M†”‚É‚æ‚Á‚Äê‡•ª‚¯
+            switch (trafficLights.Length)
+            {
+                case 3:
+                    //>>ˆê”ÔŠJ‚¢‚½Šp‚Ì‚à‚Ì‚ª“¯‚É—ÎorÔ‚É‚È‚é‚æ‚¤‚É‚·‚é
+                    //Å‘åŠp‚ğ’T‚·
+                    float angleMax = 0f;
+                    int indexMax = -1;
+                    for(int cnt = 0; cnt < trafficLights.Length; cnt++)
+                    {
+                        if (angleMax < angularDifferences[cnt])
+                        {
+                            angleMax = angularDifferences[cnt];
+                            indexMax = cnt;
+                        }
+                    }
+
+                    //indexMax‚ğ2”Ô–Ú‚É‚È‚é‚æ‚¤‚É‚¸‚ç‚¹‚Î—Ç‚¢
+                    int addition = 2 - indexMax;
+                    for(int oldIndex = 0; oldIndex < trafficLights.Length; oldIndex++)
+                    {
+                        int newIndex = (oldIndex + addition) % 3;
+                        newArray[newIndex] = trafficLights[oldIndex];
+                    }
+
+                    break;
+            }
+
+            return newArray;
         }
 
         /// <summary>
