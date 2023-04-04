@@ -120,6 +120,10 @@ namespace InGame
                     }
 
                     break;
+
+                default:
+                    newArray = trafficLights;
+                    break;
             }
 
             return newArray;
