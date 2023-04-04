@@ -11,6 +11,9 @@ namespace InGame
         [Tooltip("RoadJointを回る回転速度")]
         [SerializeField] private float angularSpeed = 30f;
 
+        [Tooltip("車線変更時の回転速度")]
+        [SerializeField] private float angularSpeedChangingLane = 10f;
+
         private enum State
         {
             runningRoad,
@@ -75,6 +78,54 @@ namespace InGame
         /// </summary>
         private uint nextLaneID;
 
+        /// <summary>
+        /// 次のRoadJoint。runningRoad開始時に更新
+        /// </summary>
+        private RoadJoint nextRoadJoint;
+
+        /// <summary>
+        /// 次へ向かう道路が平行なとき。trueならrunningJointではなくchangingLaneに移る。
+        /// </summary>
+        private bool nextIsParallel;
+
+        /// <summary>
+        /// 車両の正面ベクトル
+        /// </summary>
+        public Vector2 front
+        {
+            get
+            {
+                return transform.right;
+            }
+        }
+
+        [Tooltip("道路の角度（度）がこれ以下なら平行とみなす")]
+        [SerializeField] private float roadsParallelThreshold = 10f;
+
+        [Tooltip("車線変更時、目的の車線までの回転半径がこれ以下になったら回転移動による調整を開始する。")]
+        [SerializeField] private float thresholdRadiusChangingLane = 5f;
+
+        [Tooltip("車線変更時、目的の車線との最大角度")]
+        [SerializeField] private float angleMaxChangingLane = 10f;
+
+        [Tooltip("車線変更時、道路との角度がこれ以下になったら道路と平行とみなす")]
+        [SerializeField] private float parallelThresholdChangingLane = 3f;
+
+        /// <summary>
+        /// 車線変更でカーブモードに入った
+        /// </summary>
+        private bool changingLaneRotating = false;
+
+        /// <summary>
+        /// 車線変更終了フラグ
+        /// </summary>
+        private bool changingLaneFinished = false;
+
+        /// <summary>
+        /// 車線変更時の円弧軌道
+        /// </summary>
+        private CurveRoute curveChangingLane;
+
         private void Update()
         {
             Run();
@@ -93,6 +144,10 @@ namespace InGame
 
                 case State.runningJoint:
                     RunJoint();
+                    break;
+
+                case State.changingLane:
+                    ChangeLane();
                     break;
             }
         }
@@ -181,6 +236,7 @@ namespace InGame
             currentLane = laneID;
             currentDistanceInRoad = 0f;
             currentAlongRoad = road.alongVectors[edgeID];
+            nextRoadJoint = road.GetDiffrentEdge(startingJoint);
 
             //現在位置を道路に開始位置に調整
             AdjustStartingPositionInRoad(road, laneID, edgeID, first);
@@ -188,13 +244,29 @@ namespace InGame
             //現在の行き先の座標
             Vector2 destinationPoint;
 
-            //次のJoint回転を計算
-            if (TryGetNextCurveRoute(road.GetDiffrentEdge(startingJoint))){
-                //次のJoint移動がある場合、回転開始位置までrunningRoad
-                destinationPoint = currentCurveRoute.startingPoint;
+            if(routes.Count > 0)
+            {
+                //>>次のJointが存在
+                //次のJoint回転を計算
+                if (TryGetNextCurveRoute(road.GetDiffrentEdge(startingJoint)))
+                {
+                    nextIsParallel = false;
+
+                    //次のJoint移動がある場合、回転開始位置までrunningRoad
+                    destinationPoint = currentCurveRoute.startingPoint;
+                }
+                else
+                {
+                    //>>平行
+                    nextIsParallel = true;
+
+                    //Jointまで走る
+                    destinationPoint = road.GetDiffrentEdge(startingJoint).transform.position;
+                }
             }
             else
             {
+                //>>次が終点
                 //次のJoint移動がない場合（終点の場合）、Jointまで走る
                 destinationPoint = road.GetDiffrentEdge(startingJoint).transform.position;
             }
@@ -234,17 +306,17 @@ namespace InGame
         /// <summary>
         /// 次のcurveRouteを取得
         /// </summary>
-        /// <returns>次が終点などでJoint移動が無い場合はfalse</returns>
+        /// <returns>平行の場合はfalse</returns>
         private bool TryGetNextCurveRoute(RoadJoint curvingJoint)
         {
-            //次が終点
-            if (routes.Count == 0)
+            //次のRoad
+            Road nextRoad = routes.Peek();
+
+            //次と平行
+            if (IsParallel(currentRoad.alongVectors[0], nextRoad.alongVectors[0], roadsParallelThreshold))
             {
                 return false;
             }
-
-            //次のRoad
-            Road nextRoad = routes.Peek();
 
             //取得
             currentCurveRoute = GetCurveRoute(
@@ -265,7 +337,7 @@ namespace InGame
         {
             //TODO
             nextLaneID = 0;
-            return 0;
+            return nextLaneID;
         }
 
         /// <summary>
@@ -309,8 +381,16 @@ namespace InGame
                 if(routes.Count > 0)
                 {
                     //>>まだ終点まで来ていない
-                    //Joint回転モードに入る
-                    StartRunningJoint();
+                    if (nextIsParallel)
+                    {
+                        //車線変更モード
+                        StartChangingLane();
+                    }
+                    else
+                    {
+                        //Joint回転モードに入る
+                        StartRunningJoint();
+                    }
                 }
                 else
                 {
@@ -388,34 +468,184 @@ namespace InGame
         /// </summary>
         private bool CheckPassedJoint()
         {
-            if (currentCurveRoute.clockwise)
+            return CheckCircularFinished(currentAngle, currentCurveRoute);
+        }
+
+        /// <summary>
+        /// 車線変更を開始
+        /// </summary>
+        private void StartChangingLane()
+        {
+            GetNextLane();
+
+            changingLaneRotating = false;
+            curveChangingLane = new CurveRoute();
+
+            state = State.changingLane;
+        }
+
+        /// <summary>
+        /// 車線変更
+        /// </summary>
+        private void ChangeLane()
+        {
+            Road nextRoad = routes.Peek();
+            Vector2 nextVector = nextRoad.alongVectors[nextRoad.GetEdgeID(nextRoadJoint)];
+            uint nextEdgeID = nextRoad.GetEdgeID(nextRoadJoint);
+            Vector2 nextLaneStartingPoint = nextRoad.GetStartingPoint(nextEdgeID, nextLaneID);
+
+            if(!changingLaneRotating)
             {
-                //時計回り
-                if (currentCurveRoute.startingAngle > currentCurveRoute.endingAngle)
-                {
-                    //x軸正を経過しない
-                    return (currentAngle <= currentCurveRoute.endingAngle);
-                }
-                else
-                {
-                    //x軸正を経過
-                    return (currentAngle <= currentCurveRoute.endingAngle - 360);
-                }
+                TryMakeCurveChangingLane(nextLaneStartingPoint, nextVector);
+            }
+
+            if (changingLaneRotating)
+            {
+                //回転移動
+                ChangeLaneRotation(nextLaneStartingPoint, nextVector, curveChangingLane);
             }
             else
             {
-                //反時計回り
-                if (currentCurveRoute.startingAngle < currentCurveRoute.endingAngle)
+                //前進しながら曲がる
+                ChangeLaneForward(nextLaneStartingPoint, nextVector);
+            }
+        }
+
+        /// <summary>
+        /// 車線変更時、円弧移動を仮定して、回転移動モードに入るか判断
+        /// </summary>
+        private bool TryMakeCurveChangingLane(Vector2 nextLaneStartingPoint, Vector2 nextVector)
+        {
+            //平行ならfalse
+            if(IsParallel(nextVector, front, parallelThresholdChangingLane))
+            {
+                return false;
+            }
+
+            //>>回転移動すると仮定したときの半径・中心を求める
+            //現在の進行方向の法線ベクトル
+            Vector2 perpendicularFromAhead = GetPerpendicular(front);
+
+            //進行方向と車線方向の角の二等分線ベクトル
+            Vector2 bisector = GetBisector(-front, nextVector);
+
+            //回転中心の座標
+            Vector2 rotationCenter = GetIntersection(transform.position, perpendicularFromAhead, nextLaneStartingPoint, bisector);
+
+            //回転半径
+            float radius = Vector2.Distance(rotationCenter, transform.position);
+
+            if (radius <= thresholdRadiusChangingLane)
+            {
+                //回転移動を開始
+                changingLaneRotating = true;
+
+                //>>回転軌道の具体化
+                //回転方向を算出
+                float angularDiference = Quaternion.FromToRotation(front, nextVector).eulerAngles.z;
+                bool clockwise;
+                if (angularDiference < 180f)
                 {
-                    //x軸正を経過しない
-                    return (currentAngle >= currentCurveRoute.endingAngle);
+                    //反時計回り
+                    clockwise = true;
                 }
                 else
                 {
-                    //x軸正を経過
-                    return (currentAngle >= currentCurveRoute.endingAngle + 360);
+                    //時計回り
+                    clockwise = false;
                 }
+
+                //カーブの始点・終点を求める
+                Vector2 startingPoint = transform.position;
+                Vector2 endingPoint = GetFootOfPerpendicular(rotationCenter, nextLaneStartingPoint, nextVector);
+
+                //角度を求める
+                float startingAngle = Quaternion.FromToRotation(Vector2.right, startingPoint - rotationCenter).eulerAngles.z;
+                float endingAngle = Quaternion.FromToRotation(Vector2.right, endingPoint - rotationCenter).eulerAngles.z;
+
+                //軌道の保存
+                curveChangingLane.center = rotationCenter;
+                curveChangingLane.radius = radius;
+                curveChangingLane.clockwise = clockwise;
+                curveChangingLane.startingAngle = startingAngle;
+                curveChangingLane.endingAngle = endingAngle;
+
+                //現在の角度
+                currentAngle = startingAngle;
+
+                return true;
             }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 車線変更時の、最後の回転移動
+        /// </summary>
+        private void ChangeLaneRotation(Vector2 targetLanePoint, Vector2 targetLaneVector, CurveRoute curve)
+        {
+            //角度を移動させる
+            if (curveChangingLane.clockwise)
+            {
+                currentAngle -= GetAngularSpeedInChangingLane() * Time.deltaTime;
+            }
+            else
+            {
+                currentAngle += GetAngularSpeedInChangingLane() * Time.deltaTime;
+            }
+
+            if(CheckCircularFinished(currentAngle, curve)){
+                //>>行き過ぎたので車線方向へ戻す
+
+                //座標
+                transform.position = GetPositionFromPolar(curve.center, curve.radius, curve.endingAngle);
+
+                //回転
+                transform.rotation = GetRotationInJoint(curve.endingAngle, curve.clockwise);
+
+                //車線変更を終了
+                StartRunningRoad(routes.Dequeue(), nextLaneID, nextRoadJoint);
+            }
+            else
+            {
+                //座標
+                transform.position = GetPositionFromPolar(curve.center, curve.radius, currentAngle);
+
+                //回転
+                transform.rotation = GetRotationInJoint(currentAngle, curve.clockwise);
+            }
+        }
+
+        /// <summary>
+        /// 車線変更時、前進しながら曲がる
+        /// </summary>
+        private void ChangeLaneForward(Vector2 targetLanePoint, Vector2 targetLaneVector)
+        {
+            //曲がる方向を算出
+            bool shouldTurnRight = !IsRightFromVector(transform.position, targetLanePoint, targetLaneVector);
+
+            //進行方向に対する車線の角度
+            float angularDifference = Vector2.Angle(front, targetLaneVector);
+
+            //回転角を算出
+            float angularMovement = Mathf.Min(angleMaxChangingLane -angularDifference, GetAngularSpeedInChangingLane() * Time.deltaTime);
+
+            if (shouldTurnRight)
+            {
+                //右に曲がる場合、正負反転
+                angularMovement = -angularMovement;
+            }
+
+            //回転
+            transform.rotation = transform.rotation * Quaternion.Euler(0, 0, angularMovement);
+
+            //回転後に前進
+            transform.position += (Vector3)(front.normalized * GetSpeedInRoad() * Time.deltaTime);
+        }
+
+        private float GetAngularSpeedInChangingLane()
+        {
+            return angularSpeedChangingLane;
         }
 
         /// <summary>
@@ -601,6 +831,112 @@ namespace InGame
         private static Vector2 GetPositionFromPolar(Vector2 pole, float radius, float angular)
         {
             return pole + (Vector2)(Quaternion.Euler(0f, 0f, angular) * Vector2.right) * radius;
+        }
+
+        /// <summary>
+        /// 二つのベクトルが平行か（閾値以下）か返す
+        /// </summary>
+        private bool IsParallel(Vector2 vec0, Vector2 vec1, float threshold)
+        {
+            
+            float angle = Vector2.Angle(vec0, vec1);
+
+            if((angle <= threshold)
+                ||(Mathf.Abs(angle -180f) <= threshold)
+                ||(Mathf.Abs(angle -360f) <= threshold)){
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 点と直線の距離を求める
+        /// </summary>
+        private static float GetDistance(Vector2 point, Vector2 linePoint, Vector2 lineVector)
+        {
+            //pointの相対座標
+            Vector2 pointToLineStart = point - linePoint;
+
+            //pointからの正射影点
+            float dotProduct = Vector2.Dot(pointToLineStart, lineVector);
+            Vector2 projection = linePoint + lineVector * dotProduct;
+
+            //相対座標と正射影点の距離を求めれば良い
+            return Vector2.Distance(point, projection);
+        }
+
+        /// <summary>
+        /// 法線ベクトルを求める
+        /// </summary>
+        private static Vector2 GetPerpendicular(Vector2 vec)
+        {
+            return new Vector2(vec.y, -vec.x);
+        }
+
+        private static Vector2 GetBisector(Vector2 vec0, Vector2 vec1)
+        {
+            Vector2 u0 = vec0.normalized;
+            Vector2 u1 = vec1.normalized;
+
+            return (u0 + u1).normalized;
+        }
+
+        /// <summary>
+        /// 与えられたベクトルに対し、与えられた点が右にあるかを返す
+        /// </summary>
+        private static bool IsRightFromVector(Vector2 point, Vector2 linePoint, Vector2 lineVector)
+        {
+            float angularDiference = Quaternion.FromToRotation(lineVector, point-linePoint).eulerAngles.z;
+
+            if (angularDiference < 180f)
+            {
+                //左にある
+                return false;
+            }
+            else
+            {
+                //右にある
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// 回転運動が終了したか確認
+        /// </summary>
+        private static bool CheckCircularFinished(float currentAngle, CurveRoute curveRoute)
+        {
+            if (curveRoute.clockwise)
+            {
+                //時計回り
+                if (curveRoute.startingAngle > curveRoute.endingAngle)
+                {
+                    //x軸正を経過しない
+                    return (currentAngle <= curveRoute.endingAngle);
+                }
+                else
+                {
+                    //x軸正を経過
+                    return (currentAngle <= curveRoute.endingAngle - 360);
+                }
+            }
+            else
+            {
+                //反時計回り
+                if (curveRoute.startingAngle < curveRoute.endingAngle)
+                {
+                    //x軸正を経過しない
+                    return (currentAngle >= curveRoute.endingAngle);
+                }
+                else
+                {
+                    //x軸正を経過
+                    return (currentAngle >= curveRoute.endingAngle + 360);
+                }
+            }
+            
         }
 
         /// <summary>
