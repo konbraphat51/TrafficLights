@@ -85,7 +85,7 @@ namespace InGame
         /// <summary>
         /// —×Ús—ñ
         /// </summary>
-        private Road?[,] adjacency;
+        private Road[,] adjacency;
 
         /// <summary>
         /// —×Ús—ñ‚Í‚±‚Ì‡

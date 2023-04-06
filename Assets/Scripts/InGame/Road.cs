@@ -16,7 +16,7 @@ namespace InGame
         [SerializeField] private Transform[] _edges;
 
         [Tooltip("両端に設置されている信号機。edgeObjectsと同じ順番で登録すること")]
-        [SerializeField] private TrafficLight[] trafficLights;
+        [SerializeField] private TrafficLight[] _trafficLights;
 
         [Tooltip("Edge0の開始位置外側（左側）車線からいれること")]
         [SerializeField] private Transform[] _startingPoint0;
@@ -115,6 +115,14 @@ namespace InGame
                 return output;
             }
         } 
+
+        public TrafficLight[] trafficLights
+        {
+            get
+            {
+                return _trafficLights;
+            }
+        }
                
 
         /// <summary>
