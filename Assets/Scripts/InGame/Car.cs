@@ -91,6 +91,11 @@ namespace InGame
         private bool nextIsParallel;
 
         /// <summary>
+        /// 現在考えるべき対象の信号機
+        /// </summary>
+        private TrafficLight currentTrafficLight;
+
+        /// <summary>
         /// 車両の正面ベクトル
         /// </summary>
         public Vector2 front
@@ -120,17 +125,36 @@ namespace InGame
         [SerializeField] private Transform detectionRayStart;
 
         [Tooltip("検出ビーム終点・前")]
-        [SerializeField] private Transform[] detectionRayDestinationFront;
+        [SerializeField] private Transform[] detectionRayDestinationsFront;
+
+        [Tooltip("検出ビーム終点・左前")]
+        [SerializeField] private Transform[] detectionRayDestinationsFrontLeft;
+
+        [Tooltip("検出ビーム終点・右前")]
+        [SerializeField] private Transform[] detectionRayDestinationsFrontRight;
 
         [Tooltip("検出ビーム終点・左")]
-        [SerializeField] private Transform[] detectionRayDestinationLeft;
+        [SerializeField] private Transform[] detectionRayDestinationsLeft;
 
         [Tooltip("検出ビーム終点・右")]
-        [SerializeField] private Transform[] detectionRayDestinationRight;
+        [SerializeField] private Transform[] detectionRayDestinationsRight;
+
+        [Tooltip("メートル原器・始点")]
+        [SerializeField] private Transform meterPrototypeStart;
+
+        [Tooltip("メートル原器・終点")]
+        [SerializeField] private Transform meterPrototypeEnd;
 
         [Header("その他")]
         [Tooltip("同一直線上と判断する外積の閾値")]
         [SerializeField] private float onSameLineThreshold = 0.05f;
+
+        //検出された車
+        private List<Car> carsDetectedFront = new List<Car>();
+        private List<Car> carsDetectedFrontLeft = new List<Car>();
+        private List<Car> carsDetectedFrontRight = new List<Car>();
+        private List<Car> carsDetectedLeft = new List<Car>();
+        private List<Car> carsDetectedRight = new List<Car>();
 
         /// <summary>
         /// 車線変更でカーブモードに入った
@@ -142,9 +166,21 @@ namespace InGame
         /// </summary>
         private CurveRoute curveChangingLane;
 
+        /// <summary>
+        /// グローバル座標距離からメートルに直す係数
+        /// </summary>
+        private float globalToMeterCoef
+        {
+            get
+            {
+                return 1f / (meterPrototypeStart.position - meterPrototypeEnd.position).magnitude;
+            }
+        }
+
         private void Update()
         {
             Run();
+            Detect();
         }
 
         /// <summary>
@@ -166,6 +202,14 @@ namespace InGame
                     ChangeLane();
                     break;
             }
+        }
+
+        /// <summary>
+        /// 検出ビームを発射して、周囲の物体を検出する。
+        /// </summary>
+        private void Detect()
+        {
+            DetectCars();
         }
 
         /// <summary>
@@ -292,6 +336,9 @@ namespace InGame
 
             //開始位置時点での走行距離
             currentDistanceInRoad = targetDistanceInRoad - Vector2.Distance(transform.position, destinationPoint);
+
+            //信号機を検知
+            currentTrafficLight = DetectTrafficLight(currentRoad, edgeID);
 
             //ステートを変更
             state = State.runningRoad;
@@ -572,9 +619,6 @@ namespace InGame
 
             //回転中心の座標
             Vector2 rotationCenter = MyMath.GetIntersection(transform.position, perpendicularFromAhead, intersection, bisector);
-
-            GameObject a = new GameObject();
-            a.transform.position = rotationCenter;
 
             //回転半径
             float radius = Vector2.Distance(rotationCenter, transform.position);
@@ -858,6 +902,72 @@ namespace InGame
                     return (currentAngle >= curveRoute.endingAngle + 360);
                 }
             }
+        }
+
+        /// <summary>
+        /// 車を検出
+        /// </summary>
+        private void DetectCars()
+        {
+            carsDetectedFront = LunchDetectionRayForCars(detectionRayStart, detectionRayDestinationsFront);
+            carsDetectedFrontLeft = LunchDetectionRayForCars(detectionRayStart, detectionRayDestinationsFrontLeft);
+            carsDetectedFrontRight = LunchDetectionRayForCars(detectionRayStart, detectionRayDestinationsFrontRight);
+            carsDetectedLeft = LunchDetectionRayForCars(detectionRayStart, detectionRayDestinationsLeft);
+            carsDetectedRight = LunchDetectionRayForCars(detectionRayStart, detectionRayDestinationsRight);
+        }
+
+        /// <summary>
+        /// 信号機を検出
+        /// </summary>
+        private TrafficLight DetectTrafficLight(Road road, uint startingEdgeID)
+        {
+            //始点と反対側の信号機を検出
+            TrafficLight trafficLight = road.trafficLights[Road.GetDifferentEdgeID(startingEdgeID)];
+
+            if (trafficLight.enabled)
+            {
+                //信号機が起動している
+                return trafficLight;
+            }
+            else{
+                //信号機が起動されていない
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 検出ビームを発射して、検出された車の配列を返す
+        /// </summary>
+        private List<Car> LunchDetectionRayForCars(Transform rayStartTransform, Transform[] rayEndTransforms)
+        {
+            List<Car> output = new List<Car>();
+
+            Vector2 rayStart = rayStartTransform.position;
+
+            foreach(Transform rayEndTransform in rayEndTransforms)
+            {
+                Vector2 rayEnd = rayEndTransform.position;
+
+                //検出ビームを発射
+                RaycastHit2D[] hitteds = Physics2D.RaycastAll(rayStart, rayEnd - rayStart, (rayEnd - rayStart).magnitude);
+
+                //衝突したオブジェクトから車を列挙
+                foreach (RaycastHit2D hitted in hitteds)
+                {
+                    //Carコンポーネントがあるか+自分自身ではないかを確認
+                    Car car = hitted.collider.gameObject.GetComponent<Car>();
+                    if ((car != null)
+                        &&(car != this))
+                    {
+                        //車である
+                        output.Add(car);
+
+                        Debug.Log("Detected");
+                    }
+                }
+            }
+
+            return output;
         }
 
         /// <summary>

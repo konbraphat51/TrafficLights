@@ -172,7 +172,7 @@ MonoBehaviour:
   _edges:
   - {fileID: 166629430005712342}
   - {fileID: 844882739203864691}
-  trafficLights:
+  _trafficLights:
   - {fileID: 5452543837669190856}
   - {fileID: 3938701488126767641}
   _startingPoint0:
