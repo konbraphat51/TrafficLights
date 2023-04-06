@@ -5,10 +5,36 @@ namespace InGame
 {
     public class Car : MonoBehaviour
     {
-        [Header("速度関係")]
+        [Header("runningRoadの速度モデル")]
 
-        [Tooltip("スピード")]
-        [SerializeField] private float speed = 5f;
+        [Tooltip("反応遅れ時間T（秒）")]
+        [SerializeField] private float runningRoadT = 0.74f;
+
+        [Tooltip("希望速度v0（グローバル座標）")]
+        [SerializeField] private float runningRoadV0 = 5f;
+
+        [Tooltip("緩和時間t_1（秒）")]
+        [SerializeField] private float runningRoadT1 = 2.45f;
+
+        [Tooltip("緩和時間t_2（秒）")]
+        [SerializeField] private float runningRoadT2 = 0.77f;
+
+        [Tooltip("相互作用距離R（グローバル座標）")]
+        [SerializeField] private float runningRoadR = 1f;
+
+        [Tooltip("相互作用距離R'（グローバル座標）")]
+        [SerializeField] private float runningRoadRp = 20f;
+
+        [Tooltip("停車時の車間距離d")]
+        [SerializeField] private float runningRoadD = 0.5f;
+
+        [Tooltip("スポーン時の速度の係数（v0に掛け算する）")]
+        [SerializeField] private float spawnedSpeedCoef = 0.75f;
+
+        [Tooltip("この角度以内なら他の車が同じ向きを走っていると判断")]
+        [SerializeField] private float runningRoadSameDirectionThreshold = 60f;
+
+        [Header("速度関係")]
 
         [Tooltip("RoadJointを回る回転速度")]
         [SerializeField] private float angularSpeed = 30f;
@@ -49,6 +75,11 @@ namespace InGame
         /// 現在走っている道路の車線番号
         /// </summary>
         public uint currentLane { get; private set; } = 0;
+
+        /// <summary>
+        /// 前フレームまでの速度
+        /// </summary>
+        public float currentSpeed { get; private set; }
 
         /// <summary> 
         /// 現在使ってる道沿いベクトル
@@ -139,12 +170,6 @@ namespace InGame
         [Tooltip("検出ビーム終点・右")]
         [SerializeField] private Transform[] detectionRayDestinationsRight;
 
-        [Tooltip("メートル原器・始点")]
-        [SerializeField] private Transform meterPrototypeStart;
-
-        [Tooltip("メートル原器・終点")]
-        [SerializeField] private Transform meterPrototypeEnd;
-
         [Header("その他")]
         [Tooltip("同一直線上と判断する外積の閾値")]
         [SerializeField] private float onSameLineThreshold = 0.05f;
@@ -166,21 +191,23 @@ namespace InGame
         /// </summary>
         private CurveRoute curveChangingLane;
 
-        /// <summary>
-        /// グローバル座標距離からメートルに直す係数
-        /// </summary>
-        private float globalToMeterCoef
+        private void Start()
         {
-            get
-            {
-                return 1f / (meterPrototypeStart.position - meterPrototypeEnd.position).magnitude;
-            }
+            InitializeSpeed();
         }
 
         private void Update()
         {
             Run();
             Detect();
+        }
+
+        /// <summary>
+        /// スポーン時の初速度を設定
+        /// </summary>
+        private void InitializeSpeed()
+        {
+            currentSpeed = runningRoadV0 * spawnedSpeedCoef;
         }
 
         /// <summary>
@@ -481,7 +508,41 @@ namespace InGame
         /// </summary>
         private float GetSpeedInRoad()
         {
-            return speed;
+            //前を走っている車を取得
+            Car frontCar = GetFrontCarRunningRoad();
+
+            //前を走っている車の速さ
+            float frontSpeed;
+            //前の車との距離
+            float s;
+            if (frontCar != null)
+            {
+                //前を走っている車が存在する
+                frontSpeed = frontCar.GetSpeed().magnitude;
+                s = Vector2.Distance(frontCar.transform.position, this.transform.position);
+            }
+            else
+            {
+                //前の車が存在しない
+                frontSpeed = runningRoadV0;
+                s = float.MaxValue;
+            }
+
+            //速度計算
+            currentSpeed = CalculateGFM(
+                    currentSpeed,
+                    s,
+                    frontSpeed,
+                    runningRoadT,
+                    runningRoadV0,
+                    runningRoadT1,
+                    runningRoadT2,
+                    runningRoadR,
+                    runningRoadRp,
+                    runningRoadD
+                );
+
+            return currentSpeed;
         }
 
         /// <summary>
@@ -905,6 +966,67 @@ namespace InGame
         }
 
         /// <summary>
+        /// 現在の速度を返す
+        /// </summary>
+        public Vector2 GetSpeed()
+        {
+            switch (state)
+            {
+                case State.runningRoad:
+                    return front.normalized * currentSpeed;
+
+                default:
+                    Debug.LogError("未定義エラー");
+                    return Vector2.zero;
+            }
+        }
+
+        /// <summary>
+        /// Generalized Force Modelを計算
+        /// </summary>
+        private float CalculateGFM(
+            float formerSpeed,
+            float s,
+            float frontSpeed,
+            float T,
+            float v0,
+            float t1,
+            float t2,
+            float r,
+            float rp,
+            float d
+            )
+        {
+
+            float sFunc = d + T * formerSpeed;
+
+            float dv = formerSpeed - frontSpeed;
+
+            float V = v0 * (1f - Mathf.Exp(-(s - sFunc) / r));
+
+            float theta;
+            if (dv <= 0)
+            {
+                theta = 0f;
+            }
+            else
+            {
+                theta = 1f;
+            }
+
+            float xpp = (V - formerSpeed) / t1 - ((dv * theta) / t2) * Mathf.Exp(-(s - sFunc) / rp);
+
+            float outputSpeed = formerSpeed + xpp * Time.deltaTime;
+
+            if (outputSpeed < 0f)
+            {
+                outputSpeed = 0f;
+            }
+
+            return outputSpeed;
+        }
+
+        /// <summary>
         /// 車を検出
         /// </summary>
         private void DetectCars()
@@ -914,6 +1036,50 @@ namespace InGame
             carsDetectedFrontRight = LunchDetectionRayForCars(detectionRayStart, detectionRayDestinationsFrontRight);
             carsDetectedLeft = LunchDetectionRayForCars(detectionRayStart, detectionRayDestinationsLeft);
             carsDetectedRight = LunchDetectionRayForCars(detectionRayStart, detectionRayDestinationsRight);
+        }
+
+        /// <summary>
+        /// 同じ道路でrunningRoadしている一番前のCarを取得
+        /// </summary>
+        private Car GetFrontCarRunningRoad()
+        {
+            //最も近いものを線形探索
+            float nearestDistance = float.MaxValue;
+            Car nearestCar = null;
+            foreach(Car car in carsDetectedFront)
+            {
+                //破壊済みなら飛ばす
+                if(car == null)
+                {
+                    continue;
+                }
+
+                float distance = Vector2.Distance(car.transform.position, this.transform.position);
+
+                if (distance < nearestDistance)
+                {
+                    nearestCar = car;
+                    nearestDistance = distance;
+                }
+            }
+
+            if (nearestCar == null)
+            {
+                //該当無し
+                return null;
+            }
+
+            //frontの角度の差が閾値以内なら同じ方向を走っていると言える
+            float angleDifference = MyMath.GetAngularDifference(this.front, nearestCar.front);
+            if (angleDifference <= runningRoadSameDirectionThreshold)
+            {
+                //同じ方向を走っている
+                return nearestCar;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -961,8 +1127,6 @@ namespace InGame
                     {
                         //車である
                         output.Add(car);
-
-                        Debug.Log("Detected");
                     }
                 }
             }
