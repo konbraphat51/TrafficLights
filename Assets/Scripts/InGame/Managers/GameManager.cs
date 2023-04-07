@@ -57,7 +57,7 @@ namespace InGame
             RoadJoint[] allJoints = FindObjectsOfType<RoadJoint>();
             foreach (RoadJoint roadJoint in allJoints)
             {
-                roadJoint.ArrangeRoadsClockwise();
+                roadJoint.ArrangeRoadsAnticlockwise();
             }
 
             //èâä˙âªçœÇ›Ç…
