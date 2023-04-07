@@ -121,7 +121,12 @@ namespace InGame
         /// <summary> 
         /// 現在使ってる道沿いベクトル
         /// </summary>
-        private Vector2 currentAlongRoad;
+        public Vector2 currentAlongRoad { get; private set; }
+
+        /// <summary>
+        /// 入ってきた方のEdgeID。runningRoad開始時に更新
+        /// </summary>
+        public uint currentEdgeIDFrom { get; private set; }
 
         /// <summary>
         /// 現在走ってる道で走行した距離
@@ -361,6 +366,7 @@ namespace InGame
             currentDistanceInRoad = 0f;
             currentAlongRoad = road.alongVectors[edgeID];
             nextRoadJoint = road.GetDiffrentEdge(startingJoint);
+            currentEdgeIDFrom = edgeID;
 
             //現在位置を道路に開始位置に調整
             AdjustStartingPositionInRoad(road, laneID, edgeID, first);
@@ -632,7 +638,19 @@ namespace InGame
         /// </summary>
         private void AdvanceRoad()
         {
-            float advancedDistance = GetSpeedInRoad() * Time.deltaTime;
+            Road nextRoad;
+            uint nextEdgeID = 0;
+            if (routes.Count > 0)
+            {
+                nextRoad = routes.Peek();
+                nextEdgeID = nextRoad.GetEdgeID(nextRoadJoint);
+            }
+            else
+            {
+                nextRoad = null;
+            }
+            
+            float advancedDistance = GetSpeedInRoad(currentRoad, currentEdgeIDFrom, nextRoad, nextEdgeID) * Time.deltaTime;
             //外部（ワールド）的
             transform.position += (Vector3)(currentAlongRoad.normalized * advancedDistance);
             //内部的
@@ -642,7 +660,7 @@ namespace InGame
         /// <summary>
         /// runningRoad時の状況に対応する速度を求める
         /// </summary>
-        private float GetSpeedInRoad()
+        private float GetSpeedInRoad(Road currentRoad, uint currentEdgeIDFrom, Road nextRoad, uint nextEdgeIDFrom)
         {
             //前を走っている車を取得
             Car frontCar = GetFrontCar();
@@ -655,16 +673,8 @@ namespace InGame
             {
                 float distance = Vector2.Distance(frontCar.transform.position, this.transform.position);
 
-                Road nextRoad;
-                if(routes.Count > 0)
-                {
-                    nextRoad = routes.Peek();
-                }
-                else
-                {
-                    nextRoad = null;
-                }
-                bool isRelatedRoad = (frontCar.currentRoad == this.currentRoad) || (frontCar.currentRoad == nextRoad);
+                bool isRelatedRoad = ((frontCar.currentRoad == currentRoad) && (frontCar.currentEdgeIDFrom == currentEdgeIDFrom)) 
+                    || ((frontCar.currentRoad == nextRoad) && (frontCar.currentEdgeIDFrom == nextEdgeIDFrom));
 
                 if ((Mathf.Abs(MyMath.GetAngularDifference(frontCar.front, this.front)) > runningRoadSameDirectionThreshold)
                     && (frontCar.state != State.runningRoad)
@@ -926,7 +936,22 @@ namespace InGame
             transform.rotation = transform.rotation * Quaternion.Euler(0, 0, angularMovement);
 
             //回転後に前進
-            transform.position += (Vector3)(front.normalized * GetSpeedInRoad() * Time.deltaTime);
+            Road[] roads = routes.ToArray();
+            Road currentRoad = roads[0];
+            uint currentRoadEdgeIDFrom = currentRoad.GetEdgeID(nextRoadJoint);
+            Road nextRoad;
+            uint nextRoadEdgeIDFrom = 0;
+            if (roads.Length > 1)
+            {
+                nextRoad = roads[1];
+                nextRoadEdgeIDFrom = nextRoad.GetEdgeID(RoadJoint.FindCommonJoint(currentRoad, nextRoad));
+            }
+            else
+            {
+                nextRoad = null;
+            }
+            
+            transform.position += (Vector3)(front.normalized * GetSpeedInRoad(currentRoad, currentRoadEdgeIDFrom, nextRoad, nextRoadEdgeIDFrom) * Time.deltaTime);
         }
 
         /// <summary>
