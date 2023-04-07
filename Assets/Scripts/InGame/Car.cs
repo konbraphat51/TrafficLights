@@ -555,6 +555,7 @@ namespace InGame
             if (frontCar != null)
             {
                 float distance = Vector2.Distance(frontCar.transform.position, this.transform.position);
+                bool isRelatedRoad = (frontCar.currentRoad == this.currentRoad) || (frontCar.currentRoad == this.routes.Peek());
 
                 if ((Mathf.Abs(MyMath.GetAngularDifference(frontCar.front, this.front)) > runningJointSameDirectionThreshold)
                     && (frontCar.state != State.runningRoad)
@@ -567,9 +568,9 @@ namespace InGame
                     currentSpeed = 0f;
                     return currentSpeed;
                 }
-                else if (!((frontCar.state == State.runningRoad) && (frontCar.currentRoad != this.currentRoad)))
+                else if (!((frontCar.state == State.runningRoad) && !isRelatedRoad))
                 {
-                    //>>通常時：他の道路のrunningRoadを除外
+                    //>>通常時：関係ない道路のrunningRoadを除外
 
                     //前を走っている車が存在する
                     frontSpeed = frontCar.currentSpeed;
