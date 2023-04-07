@@ -34,6 +34,38 @@ namespace InGame
         [Tooltip("この角度以内なら他の車が同じ向きを走っていると判断")]
         [SerializeField] private float runningRoadSameDirectionThreshold = 60f;
 
+        [Tooltip("対向車がこの距離以内に来たら停車する。")]
+        [SerializeField] private float runningRoadStopDistanceThreshold = 0.5f;
+
+        [Header("runningJointの速度モデル")]
+
+        [Tooltip("反応遅れ時間T（秒）")]
+        [SerializeField] private float runningJointT = 0.74f;
+
+        [Tooltip("希望速度v0（グローバル座標）")]
+        [SerializeField] private float runningJointV0 = 2f;
+
+        [Tooltip("緩和時間t_1（秒）")]
+        [SerializeField] private float runningJointT1 = 2.45f;
+
+        [Tooltip("緩和時間t_2（秒）")]
+        [SerializeField] private float runningJointT2 = 0.77f;
+
+        [Tooltip("相互作用距離R（グローバル座標）")]
+        [SerializeField] private float runningJointR = 1f;
+
+        [Tooltip("相互作用距離R'（グローバル座標）")]
+        [SerializeField] private float runningJointRp = 20f;
+
+        [Tooltip("停車時の車間距離d")]
+        [SerializeField] private float runningJointD = 0.5f;
+
+        [Tooltip("この角度以内なら他の車が同じ向きを走っていると判断")]
+        [SerializeField] private float runningJointSameDirectionThreshold = 60f;
+
+        [Tooltip("対向車がこの距離以内に来たら停車する。")]
+        [SerializeField] private float runningJointStopDistanceThreshold = 0.5f;
+
         [Header("速度関係")]
 
         [Tooltip("RoadJointを回る回転速度")]
@@ -518,8 +550,26 @@ namespace InGame
             if (frontCar != null)
             {
                 //前を走っている車が存在する
-                frontSpeed = frontCar.GetSpeed().magnitude;
+                frontSpeed = frontCar.currentSpeed;
                 s = Vector2.Distance(frontCar.transform.position, this.transform.position);
+            
+                if (Mathf.Abs(MyMath.GetAngularDifference(frontCar.front, this.front)) > runningJointSameDirectionThreshold)
+                {
+                    //対向車がきている
+                    if (s <= runningJointSameDirectionThreshold)
+                    {
+                        //>>閾値より近い
+                        //停車する
+                        currentSpeed = 0f;
+                        return currentSpeed;
+                    }
+                    else
+                    {
+                        //存在しないものとして扱う
+                        frontSpeed = runningRoadV0;
+                        s = float.MaxValue;
+                    }
+                }
             }
             else
             {
@@ -729,6 +779,33 @@ namespace InGame
         }
 
         /// <summary>
+        /// 車線変更時、前進しながら曲がる
+        /// </summary>
+        private void ChangeLaneForward(Vector2 targetLanePoint, Vector2 targetLaneVector)
+        {
+            //曲がる方向を算出
+            bool shouldTurnRight = !MyMath.IsRightFromVector(transform.position, targetLanePoint, targetLaneVector);
+
+            //進行方向に対する車線の角度
+            float angularDifference = Vector2.Angle(front, targetLaneVector);
+
+            //回転角を算出
+            float angularMovement = Mathf.Min(angleMaxChangingLane - angularDifference, GetAngularSpeedInChangingLane() * Time.deltaTime);
+
+            if (shouldTurnRight)
+            {
+                //右に曲がる場合、正負反転
+                angularMovement = -angularMovement;
+            }
+
+            //回転
+            transform.rotation = transform.rotation * Quaternion.Euler(0, 0, angularMovement);
+
+            //回転後に前進
+            transform.position += (Vector3)(front.normalized * GetSpeedInRoad() * Time.deltaTime);
+        }
+
+        /// <summary>
         /// 車線変更時の、最後の回転移動
         /// </summary>
         private void ChangeLaneRotation(Vector2 targetLanePoint, Vector2 targetLaneVector, CurveRoute curve)
@@ -765,33 +842,6 @@ namespace InGame
             }
         }
 
-        /// <summary>
-        /// 車線変更時、前進しながら曲がる
-        /// </summary>
-        private void ChangeLaneForward(Vector2 targetLanePoint, Vector2 targetLaneVector)
-        {
-            //曲がる方向を算出
-            bool shouldTurnRight = !MyMath.IsRightFromVector(transform.position, targetLanePoint, targetLaneVector);
-
-            //進行方向に対する車線の角度
-            float angularDifference = Vector2.Angle(front, targetLaneVector);
-
-            //回転角を算出
-            float angularMovement = Mathf.Min(angleMaxChangingLane -angularDifference, GetAngularSpeedInChangingLane() * Time.deltaTime);
-
-            if (shouldTurnRight)
-            {
-                //右に曲がる場合、正負反転
-                angularMovement = -angularMovement;
-            }
-
-            //回転
-            transform.rotation = transform.rotation * Quaternion.Euler(0, 0, angularMovement);
-
-            //回転後に前進
-            transform.position += (Vector3)(front.normalized * GetSpeedInRoad() * Time.deltaTime);
-        }
-
         private float GetAngularSpeedInChangingLane()
         {
             return angularSpeedChangingLane;
@@ -812,7 +862,60 @@ namespace InGame
         /// <returns></returns>
         private float GetAngularSpeedInJoint()
         {
-            return angularSpeed;
+            //前を走っている車を取得
+            Car frontCar = GetFrontCarRunningJoint();
+
+            //前を走っている車の速さ
+            float frontSpeed;
+            //前の車との距離
+            float s;
+            if (frontCar != null)
+            {
+                //前を走っている車が存在する
+                frontSpeed = frontCar.currentSpeed;
+                s = Vector2.Distance(frontCar.transform.position, this.transform.position);
+            
+                if (Mathf.Abs(MyMath.GetAngularDifference(frontCar.front, this.front)) > runningJointSameDirectionThreshold)
+                {
+                    //対向車が来ている
+                    if (s <= runningJointStopDistanceThreshold)
+                    {
+                        //>>閾値より近い
+                        //停車する
+                        currentSpeed = 0f;
+                        return currentSpeed;
+                    }
+                    else
+                    {
+                        //前の車が存在しないものとして扱う
+                        frontSpeed = runningRoadV0;
+                        s = float.MaxValue;
+                    }   
+                }
+            }
+            else
+            {
+                //前の車が存在しない
+                frontSpeed = runningRoadV0;
+                s = float.MaxValue;
+            }
+
+            //速度計算
+            currentSpeed = CalculateGFM(
+                    currentSpeed,
+                    s,
+                    frontSpeed,
+                    runningRoadT,
+                    runningRoadV0,
+                    runningRoadT1,
+                    runningRoadT2,
+                    runningRoadR,
+                    runningRoadRp,
+                    runningRoadD
+                );
+
+            //角速度に変換して返す
+            return MyMath.GetAngularSpeed(currentSpeed, currentCurveRoute.radius);
         }
 
         /// <summary>
@@ -966,22 +1069,6 @@ namespace InGame
         }
 
         /// <summary>
-        /// 現在の速度を返す
-        /// </summary>
-        public Vector2 GetSpeed()
-        {
-            switch (state)
-            {
-                case State.runningRoad:
-                    return front.normalized * currentSpeed;
-
-                default:
-                    Debug.LogError("未定義エラー");
-                    return Vector2.zero;
-            }
-        }
-
-        /// <summary>
         /// Generalized Force Modelを計算
         /// </summary>
         private float CalculateGFM(
@@ -1039,50 +1126,6 @@ namespace InGame
         }
 
         /// <summary>
-        /// 同じ道路でrunningRoadしている一番前のCarを取得
-        /// </summary>
-        private Car GetFrontCarRunningRoad()
-        {
-            //最も近いものを線形探索
-            float nearestDistance = float.MaxValue;
-            Car nearestCar = null;
-            foreach(Car car in carsDetectedFront)
-            {
-                //破壊済みなら飛ばす
-                if(car == null)
-                {
-                    continue;
-                }
-
-                float distance = Vector2.Distance(car.transform.position, this.transform.position);
-
-                if (distance < nearestDistance)
-                {
-                    nearestCar = car;
-                    nearestDistance = distance;
-                }
-            }
-
-            if (nearestCar == null)
-            {
-                //該当無し
-                return null;
-            }
-
-            //frontの角度の差が閾値以内なら同じ方向を走っていると言える
-            float angleDifference = MyMath.GetAngularDifference(this.front, nearestCar.front);
-            if (angleDifference <= runningRoadSameDirectionThreshold)
-            {
-                //同じ方向を走っている
-                return nearestCar;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
         /// 信号機を検出
         /// </summary>
         private TrafficLight DetectTrafficLight(Road road, uint startingEdgeID)
@@ -1132,6 +1175,78 @@ namespace InGame
             }
 
             return output;
+        }
+
+        /// <summary>
+        /// 同じ道路でrunningRoadしている一つのCarを取得
+        /// </summary>
+        private Car GetFrontCarRunningRoad()
+        {
+            //最も近いものを線形探索
+            float nearestDistance = float.MaxValue;
+            Car nearestCar = null;
+            foreach (Car car in carsDetectedFront)
+            {
+                //破壊済みなら飛ばす
+                if (car == null)
+                {
+                    continue;
+                }
+
+                float distance = Vector2.Distance(car.transform.position, this.transform.position);
+
+                if (distance < nearestDistance)
+                {
+                    nearestCar = car;
+                    nearestDistance = distance;
+                }
+            }
+
+            return nearestCar;
+        }
+
+        /// <summary>
+        /// runningJoint中の一つ前のCarを取得
+        /// </summary>
+        private Car GetFrontCarRunningJoint()
+        {
+            //探索対象を列挙
+            List<Car> targets = new List<Car>();
+            targets.AddRange(carsDetectedFront);
+            if (currentCurveRoute.clockwise)
+            {
+                //時計回りなら右を見る
+                targets.AddRange(carsDetectedFrontRight);
+                targets.AddRange(carsDetectedRight);
+            }
+            else
+            {
+                //反時計回りなら左を見る
+                targets.AddRange(carsDetectedFrontLeft);
+                targets.AddRange(carsDetectedLeft);
+            }
+
+            //最も近いものを線形探索
+            float nearestDistance = float.MaxValue;
+            Car nearestCar = null;
+            foreach (Car car in targets)
+            {
+                //破壊済みなら飛ばす
+                if (car == null)
+                {
+                    continue;
+                }
+
+                float distance = Vector2.Distance(car.transform.position, this.transform.position);
+
+                if (distance < nearestDistance)
+                {
+                    nearestCar = car;
+                    nearestDistance = distance;
+                }
+            }
+
+            return nearestCar;
         }
 
         /// <summary>

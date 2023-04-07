@@ -186,4 +186,12 @@ public static class MyMath
 
         return intersectionPoint;
     }
+
+    /// <summary>
+    /// ‘¬“x‚©‚çŠp‘¬“x‚ğ‹‚ß‚é
+    /// </summary>
+    public static float GetAngularSpeed(float velocity, float radius)
+    {
+        return (180f * velocity) / (Mathf.PI * radius);
+    }
 }
