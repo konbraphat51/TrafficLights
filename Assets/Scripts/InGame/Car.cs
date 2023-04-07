@@ -532,7 +532,6 @@ namespace InGame
                         //ç∂éËë§Ç…çsÇ≠ó\íË
                         //ç∂ë§é‘ê¸Ç÷
                         return 0;
-                        
                     }
                     else
                     {
@@ -1419,6 +1418,7 @@ namespace InGame
             float angle = currentAngle;
             float angleEnd = curveRoute.endingAngle;
             Car target = null;
+            Vector2 ending = Vector2.zero;
             while(CheckCircularFinished(angle, curveRoute))
             {
                 float rayStartAngle = angle;
@@ -1438,6 +1438,8 @@ namespace InGame
 
                 Vector2 rayStart = MyMath.GetPositionFromPolar(curveRoute.center, curveRoute.radius, rayStartAngle);
                 Vector2 rayEnd = MyMath.GetPositionFromPolar(curveRoute.center, curveRoute.radius, rayEndAngle);
+
+                ending = rayEnd;
 
                 List<Car> hittedCars = LunchDetectionRayForCars(rayStart, rayEnd);
                 if (hittedCars.Count > 0)
@@ -1463,6 +1465,33 @@ namespace InGame
                         break;
                     }
                 }
+            }
+
+            //ñ¢åüèoÇÃèÍçáÅAéüÇÃìπòHÇÃîºï™Ç‡å©ÇÈ
+            if(target == null)
+            {
+                Road nextRoad = routes.Peek();
+
+                Vector2 rayStart = ending;
+                Vector2 direction = nextRoad.alongVectors[nextRoad.GetEdgeID(curveRoute.curvingJoint)] / 2f;
+
+                List<Car> cars = LunchDetectionRayForCars(rayStart, rayStart + direction);
+
+                //ç≈Ç‡ãﬂÇ¢Ç‡ÇÃÇíTÇ∑
+                Car nearestCar = null;
+                float nearestDistance = float.MaxValue;
+                foreach(Car car in cars)
+                {
+                    float distance = Vector2.Distance(car.transform.position, rayStart);
+
+                    if (distance < nearestDistance)
+                    {
+                        nearestDistance = distance;
+                        nearestCar = car;
+                    }
+                }
+
+                target = nearestCar;
             }
 
             return target;
