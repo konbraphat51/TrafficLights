@@ -117,7 +117,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3893244818809502215}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.249, y: 0, z: 0}
+  m_LocalPosition: {x: 0.27, y: 0, z: 0}
   m_LocalScale: {x: 0.01111111, y: 0.01111111, z: 0.01111111}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -248,9 +248,10 @@ MonoBehaviour:
   runningJointRp: 20
   runningJointD: 0.5
   runningJointSameDirectionThreshold: 60
-  runningJointStopDistanceThreshold: 0.5
-  angularSpeed: 90
-  angularSpeedChangingLane: 40
+  runningJointStopDistance: 0.5
+  changingLaneStopDistance: 0.5
+  changingLaneRotationSpeed: 10
+  changingLaneAngularSpeed: 20
   state: 0
   roadsParallelThreshold: 10
   thresholdRadiusChangingLane: 1
