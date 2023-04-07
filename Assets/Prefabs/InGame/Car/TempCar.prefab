@@ -239,7 +239,7 @@ MonoBehaviour:
   runningRoadD: 0.5
   spawnedSpeedCoef: 0.75
   runningRoadSameDirectionThreshold: 60
-  runningRoadStopDistanceThreshold: 0.5
+  runningRoadStopDistanceThreshold: 0.1
   runningJointT: 0.74
   runningJointV0: 2
   runningJointT1: 2.45
@@ -251,6 +251,7 @@ MonoBehaviour:
   runningJointStopDistanceThreshold: 0.5
   angularSpeed: 90
   angularSpeedChangingLane: 40
+  state: 0
   roadsParallelThreshold: 10
   thresholdRadiusChangingLane: 1
   angleMaxChangingLane: 40
