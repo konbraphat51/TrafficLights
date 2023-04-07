@@ -144,7 +144,7 @@ namespace InGame
         private float currentAngle;
 
         /// <summary>
-        /// 次のRunningRoadのlaneID
+        /// 次のRunningRoadのlaneID。runningRoad開始時に更新
         /// </summary>
         private uint nextLaneID;
 
@@ -370,6 +370,19 @@ namespace InGame
 
             if(routes.Count > 0)
             {
+                //次に走る車線を取得
+                Road[] nextRoads = routes.ToArray();
+                if (routes.Count >= 2)
+                {
+                    //「次の次」が存在
+                    nextLaneID = GetNextLane(nextRoads[0], nextRoads[1]);
+                }
+                else
+                {
+                    //次の次は終点
+                    nextLaneID = GetNextLane(nextRoads[0], null);
+                }
+
                 //>>次のJointが存在
                 //次のJoint回転を計算
                 if (TryGetNextCurveRoute(road.GetDiffrentEdge(startingJoint)))
@@ -451,7 +464,7 @@ namespace InGame
                 currentRoad,
                 currentLane,
                 nextRoad,
-                GetNextLane()
+                nextLaneID
                 );
 
             return true;
@@ -460,11 +473,98 @@ namespace InGame
         /// <summary>
         /// 次のRoadで走る車線を選ぶ
         /// </summary>
-        private uint GetNextLane()
+        private uint GetNextLane(Road roadSelecting, Road roadNext)
         {
-            //TODO
-            nextLaneID = 0;
+            uint output = 0;
+
+            switch (roadSelecting.lanes)
+            {
+                case 1:
+                    output = 0;
+                    break;
+
+                case 2:
+                    output = ChooseLaneFrom2(roadSelecting, roadNext);
+                    break;
+
+                default:
+                    Debug.LogError("未実装エラー");
+                    output = 0;
+                    break;
+            }
+
+            nextLaneID = output;
             return nextLaneID;
+        }
+
+        /// <summary>
+        /// 2車線から車線を選ぶ
+        /// </summary>
+        private uint ChooseLaneFrom2(Road selectingRoad, Road nextRoad)
+        {
+            //共通するRoadJointを探す
+            RoadJoint commonJoint = RoadJoint.FindCommonJoint(selectingRoad, nextRoad);
+
+            if(nextRoad == null)
+            {
+                //>>次が終点のとき
+                return (uint)Random.Range(0, 2);
+            }
+
+            int fromIndex = commonJoint.connectedRoads.IndexOf(selectingRoad);
+            int toIndex = commonJoint.connectedRoads.IndexOf(nextRoad);
+
+            int leftHandIndex = (int)fromIndex - 1;
+
+            switch (commonJoint.connectedRoads.Count)
+            {
+                case 2:
+                    return currentLane;
+
+                case 3:
+                    if(leftHandIndex < 0)
+                    {
+                        leftHandIndex += 3;
+                    }
+
+                    if (leftHandIndex == toIndex)
+                    {
+                        //左手側に行く予定
+                        //左側車線へ
+                        return 0;
+                        
+                    }
+                    else
+                    {
+                        //右手側に行く予定
+                        //右側車線へ
+                        return 1;
+                    }
+
+                case 4:
+                    if (leftHandIndex < 0)
+                    {
+                        leftHandIndex += 4;
+                    }
+
+                    if (leftHandIndex == toIndex)
+                    {
+
+                        //左手側に行く予定
+                        //左側車線へ
+                        return 0;
+                    }
+                    else
+                    {
+                        //真ん中、右手側に行く予定
+                        //右側車線へ
+                        return 1;
+                    }
+
+                default:
+                    Debug.LogError("未実装エラー");
+                    return 0;
+            }
         }
 
         /// <summary>
@@ -555,11 +655,21 @@ namespace InGame
             if (frontCar != null)
             {
                 float distance = Vector2.Distance(frontCar.transform.position, this.transform.position);
-                bool isRelatedRoad = (frontCar.currentRoad == this.currentRoad) || (frontCar.currentRoad == this.routes.Peek());
 
-                if ((Mathf.Abs(MyMath.GetAngularDifference(frontCar.front, this.front)) > runningJointSameDirectionThreshold)
+                Road nextRoad;
+                if(routes.Count > 0)
+                {
+                    nextRoad = routes.Peek();
+                }
+                else
+                {
+                    nextRoad = null;
+                }
+                bool isRelatedRoad = (frontCar.currentRoad == this.currentRoad) || (frontCar.currentRoad == nextRoad);
+
+                if ((Mathf.Abs(MyMath.GetAngularDifference(frontCar.front, this.front)) > runningRoadSameDirectionThreshold)
                     && (frontCar.state != State.runningRoad)
-                    && (distance <= runningRoadSameDirectionThreshold))
+                    && (distance <= runningRoadStopDistanceThreshold))
                 {
                     //>>停車条件：対向車が来ている+閾値より近い+
 
@@ -668,9 +778,6 @@ namespace InGame
         /// </summary>
         private void StartChangingLane()
         {
-            //CheckChangingLaneNecessary()より前に呼ぶ必要がある
-            GetNextLane();
-
             //車線変更の必要がないか確認
             if (CheckChangingLaneNecessary())
             {

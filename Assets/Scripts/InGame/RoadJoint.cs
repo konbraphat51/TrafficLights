@@ -18,9 +18,9 @@ namespace InGame
         public List<Road> connectedRoads { get; private set; } = new List<Road>();
 
         /// <summary>
-        /// connectedRoadsが時計回りに並べ替え済みか
+        /// connectedRoadsが反時計回りに並べ替え済みか
         /// </summary>
-        public bool sortedClockwise { get; private set; } = false;
+        public bool sortedAnticlockwise { get; private set; } = false;
 
         /// <summary>
         /// 各connectedRoadのどちらの端が繋がっているか
@@ -41,9 +41,9 @@ namespace InGame
         }
 
         /// <summary>
-        /// Intersectionから見てroadを時計回りに並べる
+        /// Intersectionから見てroadを反時計回りに並べる
         /// </summary>
-        public virtual void ArrangeRoadsClockwise()
+        public virtual void ArrangeRoadsAnticlockwise()
         {
             //各Roadとのx軸正方向からの時計回りの角度を求める
             Dictionary<Road, float> angles = new Dictionary<Road, float>();
@@ -62,11 +62,32 @@ namespace InGame
                 orderedRoad.Add(roadAngle.Key);
             }
 
-            //時計回りに登録しなおす
+            //登録しなおす
             connectedRoads = orderedRoad;
 
-            //時計回り並べ替え済みに
-            sortedClockwise = true;
+            //並べ替え済みに
+            sortedAnticlockwise = true;
+        }
+
+        /// <summary>
+        /// 二つの道路に共通するRoadJoint
+        /// </summary>
+        public static RoadJoint FindCommonJoint(Road road0, Road road1)
+        {
+            RoadJoint[] joints0 = road0.connectedJoints;
+
+            RoadJoint commonJoint = null;
+
+            foreach(RoadJoint joint in joints0)
+            {
+                if (joint.connectedRoads.Contains(road1))
+                {
+                    commonJoint = joint;
+                    break;
+                }
+            }
+
+            return commonJoint;
         }
     }
 }

@@ -18,9 +18,9 @@ namespace InGame
         /// TrafficLightsSystemに道路、信号機を登録もする
         /// Roadが登録される前のStartに登録すると不具合が発生するので、その後に呼ぶ必要がある
         /// </summary>
-        public override void ArrangeRoadsClockwise()
+        public override void ArrangeRoadsAnticlockwise()
         {
-            base.ArrangeRoadsClockwise();
+            base.ArrangeRoadsAnticlockwise();
 
             //信号機が無い場合はキャンセル
             if (trafficLightSystem == null)
