@@ -578,6 +578,24 @@ namespace InGame
                 s = float.MaxValue;
             }
 
+            if((currentTrafficLight != null)
+                &&(currentTrafficLight.color != TrafficLight.Color.green))
+            {
+                //対象の信号機が存在していて、黄色か赤色
+                
+                //距離
+                float distanceFromLight = Vector2.Distance(this.transform.position, currentTrafficLight.transform.position);
+                
+                if (s >= distanceFromLight)
+                {
+                    //>>対象との距離より近い
+                    //前に停止車両があるとしてすり替え
+                    s = distanceFromLight;
+                    frontSpeed = 0f;
+                }
+
+            }
+            
             //速度計算
             currentSpeed = CalculateGFM(
                     currentSpeed,
@@ -863,7 +881,7 @@ namespace InGame
         private float GetAngularSpeedInJoint()
         {
             //前を走っている車を取得
-            Car frontCar = GetFrontCarRunningJoint();
+            Car frontCar = DetectFrontCarInJoint(currentCurveRoute);
 
             //前を走っている車の速さ
             float frontSpeed;
@@ -1149,28 +1167,54 @@ namespace InGame
         /// </summary>
         private List<Car> LunchDetectionRayForCars(Transform rayStartTransform, Transform[] rayEndTransforms)
         {
+            Vector2 rayStart = rayStartTransform.position;
+            Vector2[] rayEnds = new Vector2[rayEndTransforms.Length];
+            for(int cnt = 0; cnt < rayEndTransforms.Length; cnt++)
+            {
+                rayEnds[cnt] = rayEndTransforms[cnt].position;
+            }
+
+            LunchDetectionRayForCars(rayStart, rayEnds);
+
+            return LunchDetectionRayForCars(rayStart, rayEnds);
+        }
+
+        /// <summary>
+        /// 検出ビームを発射して、検出された車の配列を返す
+        /// </summary>
+        private List<Car> LunchDetectionRayForCars(Vector2 rayStart, Vector2[] rayEnds)
+        {
             List<Car> output = new List<Car>();
 
-            Vector2 rayStart = rayStartTransform.position;
-
-            foreach(Transform rayEndTransform in rayEndTransforms)
+            foreach (Vector2 rayEnd in rayEnds)
             {
-                Vector2 rayEnd = rayEndTransform.position;
-
                 //検出ビームを発射
-                RaycastHit2D[] hitteds = Physics2D.RaycastAll(rayStart, rayEnd - rayStart, (rayEnd - rayStart).magnitude);
+                output.AddRange(LunchDetectionRayForCars(rayStart, rayEnd));
+            }
 
-                //衝突したオブジェクトから車を列挙
-                foreach (RaycastHit2D hitted in hitteds)
+            return output;
+        }
+
+        /// <summary>
+        /// 検出ビームを発射して、検出された車の配列を返す
+        /// </summary>
+        private List<Car> LunchDetectionRayForCars(Vector2 rayStart, Vector2 rayEnd)
+        {
+            List<Car> output = new List<Car>();
+            
+            //検出ビームを発射
+            RaycastHit2D[] hitteds = Physics2D.RaycastAll(rayStart, rayEnd - rayStart, (rayEnd - rayStart).magnitude);
+
+            //衝突したオブジェクトから車を列挙
+            foreach (RaycastHit2D hitted in hitteds)
+            {
+                //Carコンポーネントがあるか+自分自身ではないかを確認
+                Car car = hitted.collider.gameObject.GetComponent<Car>();
+                if ((car != null)
+                    && (car != this))
                 {
-                    //Carコンポーネントがあるか+自分自身ではないかを確認
-                    Car car = hitted.collider.gameObject.GetComponent<Car>();
-                    if ((car != null)
-                        &&(car != this))
-                    {
-                        //車である
-                        output.Add(car);
-                    }
+                    //車である
+                    output.Add(car);
                 }
             }
 
@@ -1247,6 +1291,63 @@ namespace InGame
             }
 
             return nearestCar;
+        }
+
+        private Car DetectFrontCarInJoint(CurveRoute curveRoute)
+        {
+            const float angleUnit = 5f;
+
+            //>>円弧上に検出ビームを出す
+            float angle = currentAngle;
+            float angleEnd = curveRoute.endingAngle;
+            Car target = null;
+            while(CheckCircularFinished(angle, curveRoute))
+            {
+                float rayStartAngle = angle;
+
+                if (curveRoute.clockwise)
+                {
+                    //時計回り
+                    angle -= angleUnit;
+                }
+                else
+                {
+                    //反時計回り
+                    angle += angleUnit;
+                }
+
+                float rayEndAngle = angle;
+
+                Vector2 rayStart = MyMath.GetPositionFromPolar(curveRoute.center, curveRoute.radius, rayStartAngle);
+                Vector2 rayEnd = MyMath.GetPositionFromPolar(curveRoute.center, curveRoute.radius, rayEndAngle);
+
+                List<Car> hittedCars = LunchDetectionRayForCars(rayStart, rayEnd);
+                if (hittedCars.Count > 0)
+                {
+                    //>>存在
+                    //rayStartに最も近いものを探す
+                    Car nearestCar = null;
+                    float nearestDistance = float.MaxValue;
+                    foreach(Car car in hittedCars)
+                    {
+                        float distance = Vector2.Distance(car.transform.position, rayStart);
+                        if ((car.state == State.runningJoint)
+                            &&(distance < nearestDistance))
+                        {
+                            nearestDistance = distance;
+                            nearestCar = car;
+                        }
+                    }
+
+                    if (nearestCar != null)
+                    {
+                        target = nearestCar;
+                        break;
+                    }
+                }
+            }
+
+            return target;
         }
 
         /// <summary>
