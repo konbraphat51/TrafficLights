@@ -1739,7 +1739,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 273477873070338371, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
       propertyPath: expectedCars
-      value: 0.5
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 273477874149142392, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
       propertyPath: m_Pivot.x
