@@ -856,6 +856,8 @@ MonoBehaviour:
   countDownDisplay: {fileID: 2356955410537823552}
   timeDisplay: {fileID: 831101567949122974, guid: eef0ed6d8b6c3da4c8959833ed94d9ff, type: 3}
   timeDisplayParent: {fileID: 1928539448705937379}
+  finishPrefab: {fileID: 5024717026664882234, guid: 366542b46ed173342a0a4e23243b8944, type: 3}
+  finishUIParent: {fileID: 273477874259944603}
 --- !u!1 &7632527744761457833
 GameObject:
   m_ObjectHideFlags: 0

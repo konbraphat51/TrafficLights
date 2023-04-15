@@ -29,6 +29,9 @@ namespace InGame
         [SerializeField] private TimeDisplay timeDisplay;
         [SerializeField] private Transform timeDisplayParent;
 
+        [SerializeField] private GameObject finishPrefab;
+        [SerializeField] private Transform finishUIParent;
+
         private GameObject currentTimeDisplayObject;
 
         /// <summary>
@@ -74,6 +77,16 @@ namespace InGame
         public void OnGameFinished()
         {
             Destroy(currentTimeDisplayObject);
+
+            GenerateFinishedUI();
+        }
+
+        /// <summary>
+        /// èIóπéûUIÇï\é¶
+        /// </summary>
+        private void GenerateFinishedUI()
+        {
+            Instantiate(finishPrefab, finishUIParent);
         }
     }
 }

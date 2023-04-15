@@ -10,9 +10,18 @@ namespace InGame.UI
     /// </summary>
     public class TimeDisplay : MonoBehaviour
     {
+        [Tooltip("c‚èŠÔ‚ª‚±‚ê–¢–‚É‚È‚é‚ÆÔ‚­‚È‚é")]
+        [SerializeField] private float timeRed = 10f;
+
         void Update()
         {
             GetComponent<TextMeshProUGUI>().text = MakeText();
+
+            //c‚è10•b–¢–‚É‚È‚é‚ÆÔ‚­‚·‚é
+            if(GameManager.Instance.gameTimeLeft < timeRed)
+            {
+                GetComponent<TextMeshProUGUI>().color = Color.red;
+            }
         }
 
         private string MakeText()
