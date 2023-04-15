@@ -16,6 +16,9 @@ namespace InGame
         [Tooltip("最高速度との差に何乗するか")]
         [SerializeField] private float scoreExponent = 2f;
 
+        [Tooltip("得点を単純拡大する")]
+        [SerializeField] private float scoreCoef = 100f;
+
         //全TrafficLightsSystemが初期化済みか
         private bool afterConnectionInitialized = false;
 
@@ -80,10 +83,21 @@ namespace InGame
         public void OnCarArrived(float speedAverage, float speedMax)
         {
             //いくら加点するか計算
-            int scoreAddition = (int)Mathf.Pow(speedMax - speedAverage, scoreExponent);
+            int scoreAddition = CalculatePoint(speedAverage, speedMax);
 
             //加点
             AddPoint(scoreAddition);
+        }
+
+        /// <summary>
+        /// 平均スピードを得点に変換する
+        /// </summary>
+        private int CalculatePoint(float speedAverage, float speedMax)
+        {
+            float difference = speedAverage　/ speedMax;
+            float powered = Mathf.Pow(difference, scoreExponent);
+
+            return (int)(powered * scoreCoef);
         }
 
         /// <summary>
@@ -91,7 +105,11 @@ namespace InGame
         /// </summary>
         private void AddPoint(int addition)
         {
+            //加点
             score += addition;
+
+            //UI更新
+            UIManager.Instance.OnPointsChanged(addition);
         }
     }
 }
