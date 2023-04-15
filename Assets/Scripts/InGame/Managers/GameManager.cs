@@ -6,6 +6,16 @@ namespace InGame
 {
     public class GameManager : SingletonMonoBehaviour<GameManager>
     {
+        /// <summary>
+        /// 得点
+        /// </summary>
+        public int score { get; private set; } = 0;
+
+        [Header("スコア関係")]
+
+        [Tooltip("最高速度との差に何乗するか")]
+        [SerializeField] private float scoreExponent = 2f;
+
         //全TrafficLightsSystemが初期化済みか
         private bool afterConnectionInitialized = false;
 
@@ -62,6 +72,26 @@ namespace InGame
 
             //初期化済みに
             afterConnectionInitialized = true;
+        }
+
+        /// <summary>
+        /// 車到達時に加点
+        /// </summary>
+        public void OnCarArrived(float speedAverage, float speedMax)
+        {
+            //いくら加点するか計算
+            int scoreAddition = (int)Mathf.Pow(speedMax - speedAverage, scoreExponent);
+
+            //加点
+            AddPoint(scoreAddition);
+        }
+
+        /// <summary>
+        /// 加点
+        /// </summary>
+        private void AddPoint(int addition)
+        {
+            score += addition;
         }
     }
 }

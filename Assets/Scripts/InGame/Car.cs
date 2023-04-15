@@ -5,6 +5,16 @@ namespace InGame
 {
     public class Car : MonoBehaviour
     {
+        private enum State
+        {
+            runningRoad,
+            runningJoint,
+            changingLane
+        }
+
+        private State state;
+
+
         [Header("runningRoadの速度モデル")]
 
         [Tooltip("反応遅れ時間T（秒）")]
@@ -79,14 +89,29 @@ namespace InGame
         [Tooltip("車線変更時回転移動の回転速度")]
         [SerializeField] private float changingLaneAngularSpeed = 10f;
 
-        private enum State
-        {
-            runningRoad,
-            runningJoint,
-            changingLane
-        }
+        [Header("スコア・満足度関係")]
 
-        [SerializeField] private State state;
+        [Tooltip("この間隔で速度を記録する（秒）")]
+        [SerializeField] private float saveSpeedInterval = 0.5f;
+
+        [Tooltip("満足度を増減させる間隔（秒）")]
+        [SerializeField] private float happinessCalculationInterval = 1f;
+
+        [Tooltip("満足度増減の閾値（希望速度に対する割合）")]
+        [SerializeField] private float[] happinessChangeThresholds;
+
+        [Tooltip("満足度の変化量")]
+        [SerializeField] private int[] happinessChangements;
+
+        [Tooltip("満足度の初期値")]
+        [SerializeField] private int happiness = 80;
+
+        private const int happinessMin = 0;
+        private const int happinessMax = 100;
+
+        private float saveSpeedTimer = 0f;
+        private List<float> savedSpeeds = new List<float>();
+        private float happinessCalculationTimer = 0f;
 
         /// <summary>
         /// 生成されたRoadJoint
@@ -242,6 +267,7 @@ namespace InGame
         {
             Run();
             Detect();
+            ManageHappiness();
         }
 
         /// <summary>
@@ -1018,6 +1044,11 @@ namespace InGame
         /// </summary>
         private void OnArrivedDestination()
         {
+            float speedAverage = CalculateAverageSpeed();
+
+            //GameManagerに通達
+            GameManager.Instance.OnCarArrived(speedAverage, runningRoadV0);
+
             //消える
             Destroy(this.gameObject);
         }
@@ -1520,6 +1551,111 @@ namespace InGame
             }
 
             return target;
+        }
+
+        /// <summary>
+        /// 満足度の管理をする
+        /// </summary>
+        private void ManageHappiness()
+        {
+            //速度の保存
+            SaveSpeed();
+
+            //満足度を計算
+            CalculateHappiness();
+        }
+
+        /// <summary>
+        /// 速度を保存する
+        /// </summary>
+        private void SaveSpeed()
+        {
+            //タイマー進める
+            saveSpeedTimer += Time.deltaTime;
+
+            if(saveSpeedTimer < saveSpeedInterval)
+            {
+                //まだタイマーが切れていない
+                return;
+            }
+            //>>タイマーが切れた
+
+            //速度を保存
+            savedSpeeds.Add(currentSpeed);
+
+            //タイマーリセット
+            saveSpeedTimer = saveSpeedTimer % saveSpeedInterval;
+        }
+
+        /// <summary>
+        /// 満足度の計算
+        /// </summary>
+        private void CalculateHappiness()
+        {
+            //タイマー進める
+            happinessCalculationTimer += Time.deltaTime;
+
+            if(happinessCalculationTimer < happinessCalculationInterval)
+            {
+                //まだタイマーが切れていない
+                return;
+            }
+            //>>タイマーが切れた
+
+            //満足度を増減
+            int changement = GetHappinessChangement();
+            happiness += changement;
+
+            //範囲管理
+            if (happiness < happinessMin)
+            {
+                happiness = happinessMin;
+            }
+            else if (happiness > happinessMax)
+            {
+                happiness = happinessMax;
+            }
+
+            //タイマーリセット
+            happinessCalculationTimer = happinessCalculationTimer % happinessCalculationInterval;
+        }
+
+        /// <summary>
+        /// 幸福度の変化量を計算
+        /// </summary>
+        private int GetHappinessChangement()
+        {
+            //最高速度に対する割合
+            float speedRatio = currentSpeed / runningJointV0;
+
+            //対応する変化量を探す
+            int output = happinessChangements[happinessChangeThresholds.Length - 1];
+            for(int cnt = 0; cnt < happinessChangeThresholds.Length; cnt++)
+            {
+                if(speedRatio <= happinessChangeThresholds[cnt])
+                {
+                    //cntが該当するインデックス
+                    output = happinessChangements[cnt];
+                    
+                    break;
+                }
+            }
+
+            return output;
+        }
+
+        /// <summary>
+        /// 平均速度を計算
+        /// </summary>
+        private float CalculateAverageSpeed()
+        {
+            float sum = 0f;
+            foreach(float speed in savedSpeeds)
+            {
+                sum += speed;
+            }
+
+            return sum / savedSpeeds.Count;
         }
 
         /// <summary>
