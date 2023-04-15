@@ -42,7 +42,7 @@ namespace InGame
         [Tooltip("リザルト画面のシーン名")]
         [SerializeField] private string resultSceneName = "Result";
 
-        public float countDownTimeLeft { get; private set; } = 4f;
+        public float countDownTimeLeft { get; private set; } = 3f;
 
         public float gameTimeLeft { get; private set; } = 61f;
 
@@ -147,6 +147,8 @@ namespace InGame
         private void TransferToPlaying()
         {
             sequence = Sequence.playing;
+
+            UIManager.Instance.OnCountDownFinished();
         }
 
         /// <summary>
@@ -157,6 +159,8 @@ namespace InGame
             sequence = Sequence.gameFinished;
 
             Invoke(nameof(GotoResult), gameFinishedWait);
+
+            UIManager.Instance.OnGameFinished();
         }
 
         /// <summary>

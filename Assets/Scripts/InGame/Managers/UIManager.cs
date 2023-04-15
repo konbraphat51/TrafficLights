@@ -22,6 +22,15 @@ namespace InGame
         [Header("親")]
         [SerializeField] private Transform scoreAdditionUIParent;
 
+        [Header("時間表示")]
+
+        [SerializeField] private CountDownDisplay countDownDisplay;
+
+        [SerializeField] private TimeDisplay timeDisplay;
+        [SerializeField] private Transform timeDisplayParent;
+
+        private GameObject currentTimeDisplayObject;
+
         /// <summary>
         /// 得点更新
         /// </summary>
@@ -47,6 +56,24 @@ namespace InGame
 
             //初期化
             ui.GetComponent<ScoreAdditionUI>().Initialize(additionalPoint);
+        }
+
+        /// <summary>
+        /// カウントダウン終了時処理
+        /// </summary>
+        public void OnCountDownFinished()
+        {
+            Destroy(countDownDisplay.gameObject);
+
+            currentTimeDisplayObject = Instantiate(timeDisplay.gameObject, timeDisplayParent);
+        }
+
+        /// <summary>
+        /// ゲーム終了時処理
+        /// </summary>
+        public void OnGameFinished()
+        {
+            Destroy(currentTimeDisplayObject);
         }
     }
 }
