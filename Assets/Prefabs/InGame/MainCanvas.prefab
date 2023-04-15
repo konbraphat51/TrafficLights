@@ -118,7 +118,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scoreExponent: 2
   scoreCoef: 100
-  gameTime: 61
+  gameTime: 60
   gameFinishedWait: 3
   resultSceneName: Result
 --- !u!1 &273477873070338370

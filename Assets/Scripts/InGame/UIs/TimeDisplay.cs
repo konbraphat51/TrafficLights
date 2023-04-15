@@ -19,7 +19,7 @@ namespace InGame.UI
         {
             string output = "";
 
-            int currentTime = (int)GameManager.Instance.gameTimeLeft;
+            int currentTime = (int)GameManager.Instance.gameTimeLeft + 1;
 
             int minute = currentTime / 60;
             output += minute.ToString();
