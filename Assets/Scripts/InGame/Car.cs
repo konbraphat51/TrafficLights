@@ -12,8 +12,7 @@ namespace InGame
             changingLane
         }
 
-        private State state;
-
+        [SerializeField] private State state;
 
         [Header("runningRoad‚Ì‘¬“xƒ‚ƒfƒ‹")]
 
