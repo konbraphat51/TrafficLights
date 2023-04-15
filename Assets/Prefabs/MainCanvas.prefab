@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0aec2711c2efbb544b3b881a5132cdc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  carPrefab: {fileID: 5352321147066302224, guid: 71cff933c89da914fae1fb0eb88314c6, type: 3}
+  carPrefab: {fileID: 5352321147066302224, guid: 5b0033e0ebc8da8428d781d839e20561, type: 3}
   carParent: {fileID: 273477872440545198}
   expectedCars: 1
   expectedCarsRange: 0.2
