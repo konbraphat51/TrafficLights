@@ -5,7 +5,10 @@ using UnityEngine.SceneManagement;
 
 namespace Opening
 {
-    public class SelectionButton : MonoBehaviour
+    /// <summary>
+    /// 押したらシーン遷移するボタン
+    /// </summary>
+    public class SceneButton : MonoBehaviour
     {
         [SerializeField] private string sceneName;
 

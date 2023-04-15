@@ -1814,10 +1814,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 273477872931729702, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
-      propertyPath: gameTime
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 273477873070338371, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
       propertyPath: expectedCars
       value: 1

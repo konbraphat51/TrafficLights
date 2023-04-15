@@ -252,7 +252,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6503057669073564933, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: sceneName
-      value: InGameDemo
+      value: InGameTest
       objectReference: {fileID: 0}
     - target: {fileID: 7056406220901612562, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: m_Name
