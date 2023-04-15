@@ -28,7 +28,8 @@ namespace InGame
 
         private void Update()
         {
-            if (initialized)
+            if (initialized 
+                && (GameManager.Instance.sequence == GameManager.Sequence.playing))
             {
                 AdvanceSpawnPointsTimers();
                 SpawnCars();

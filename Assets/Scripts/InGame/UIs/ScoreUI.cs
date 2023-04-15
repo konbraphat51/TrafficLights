@@ -13,7 +13,7 @@ namespace InGame.UI
         private void Start()
         {
             //‰Šú‰»ˆ—
-            UpdateScore(GameManager.Instance.score);
+            UpdateScore(GameManager.score);
         }
 
         /// <summary>

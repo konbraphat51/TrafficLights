@@ -28,7 +28,7 @@ namespace InGame
         public void OnPointsChanged(int changement)
         {
             //更新後の得点を取得
-            int currentPoints = GameManager.Instance.score;
+            int currentPoints = GameManager.score;
 
             //総合得点UIを更新させる
             scoreUI.UpdateScore(currentPoints);
@@ -37,6 +37,9 @@ namespace InGame
             GenerateAdditionalPoint(changement);
         }
 
+        /// <summary>
+        /// 加点UI生成
+        /// </summary>
         private void GenerateAdditionalPoint(int additionalPoint)
         {
             //生成

@@ -1,15 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace InGame
 {
     public class GameManager : SingletonMonoBehaviour<GameManager>
     {
+        public enum Sequence
+        {
+            countDown,
+            playing,
+            gameFinished
+        }
+
+        public Sequence sequence { get; private set; } = Sequence.countDown;
+
         /// <summary>
         /// 得点
         /// </summary>
-        public int score { get; private set; } = 0;
+        public static int score { get; private set; } = 0;
 
         [Header("スコア関係")]
 
@@ -19,8 +29,32 @@ namespace InGame
         [Tooltip("得点を単純拡大する")]
         [SerializeField] private float scoreCoef = 100f;
 
+        [Header("タイム")]
+
+        [Tooltip("ゲーム時間（秒）")]
+        [SerializeField] private float gameTime = 61f;
+
+        [Header("ゲーム終了")]
+        
+        [Tooltip("ゲーム終了してからリザルト画面に移るまでの時間")]
+        [SerializeField] private float gameFinishedWait = 3f;
+
+        [Tooltip("リザルト画面のシーン名")]
+        [SerializeField] private string resultSceneName = "Result";
+
+        public float countDownTimeLeft { get; private set; } = 4f;
+
+        public float gameTimeLeft { get; private set; } = 61f;
+
         //全TrafficLightsSystemが初期化済みか
         private bool afterConnectionInitialized = false;
+
+        private void Start()
+        {
+            //変数初期化
+            gameTimeLeft = gameTime;
+            score = 0;
+        }
 
         private void Update()
         {
@@ -30,6 +64,8 @@ namespace InGame
             {
                 InitilizeAfterRoadConnection();
             }
+
+            ManageTime();
         }
 
         /// <summary>
@@ -78,10 +114,62 @@ namespace InGame
         }
 
         /// <summary>
+        /// 残り時間の管理
+        /// </summary>
+        private void ManageTime()
+        {
+            switch (sequence)
+            {
+                case Sequence.countDown:
+                    countDownTimeLeft -= Time.deltaTime;
+
+                    //時間が来たらplayingシーケンスに切り替え
+                    if(countDownTimeLeft <= 0f)
+                    {
+                        TransferToPlaying();
+                    }
+                    break;
+
+                case Sequence.playing:
+                    gameTimeLeft -= Time.deltaTime;
+
+                    if(gameTimeLeft <= 0f)
+                    {
+                        TransferToFinished();
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Playingシーケンスに移行
+        /// </summary>
+        private void TransferToPlaying()
+        {
+            sequence = Sequence.playing;
+        }
+
+        /// <summary>
+        /// Finishedシーケンスに移行
+        /// </summary>
+        private void TransferToFinished()
+        {
+            sequence = Sequence.gameFinished;
+
+            Invoke(nameof(GotoResult), gameFinishedWait);
+        }
+
+        /// <summary>
         /// 車到達時に加点
         /// </summary>
         public void OnCarArrived(float speedAverage, float speedMax)
         {
+            //Playingシーケンスのみ
+            if(sequence != Sequence.playing)
+            {
+                return;
+            }
+
             //いくら加点するか計算
             int scoreAddition = CalculatePoint(speedAverage, speedMax);
 
@@ -110,6 +198,14 @@ namespace InGame
 
             //UI更新
             UIManager.Instance.OnPointsChanged(addition);
+        }
+
+        /// <summary>
+        /// Result画面へ遷移
+        /// </summary>
+        private void GotoResult()
+        {
+            SceneManager.LoadScene(resultSceneName);
         }
     }
 }

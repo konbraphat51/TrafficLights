@@ -118,6 +118,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scoreExponent: 2
   scoreCoef: 100
+  gameTime: 61
+  gameFinishedWait: 3
+  resultSceneName: Result
+  countDownTimeLeft: 4
 --- !u!1 &273477873070338370
 GameObject:
   m_ObjectHideFlags: 0
