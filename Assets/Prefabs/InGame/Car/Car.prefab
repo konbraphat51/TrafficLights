@@ -281,7 +281,7 @@ MonoBehaviour:
   runningRoadT1: 2.45
   runningRoadT2: 0.77
   runningRoadR: 1
-  runningRoadRp: 10
+  runningRoadRp: 8
   runningRoadD: 0.5
   spawnedSpeedCoef: 0.75
   runningRoadSameDirectionThreshold: 60
