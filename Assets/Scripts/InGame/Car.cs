@@ -113,6 +113,14 @@ namespace InGame
         private List<float> savedSpeeds = new List<float>();
         private float happinessCalculationTimer = 0f;
 
+        public float happinessRatio
+        {
+            get
+            {
+                return (float)(happiness - happinessMin) / (float)happinessMax;
+            }
+        }
+
         /// <summary>
         /// 生成されたRoadJoint
         /// </summary>
@@ -241,6 +249,9 @@ namespace InGame
         [Tooltip("同一直線上と判断する外積の閾値")]
         [SerializeField] private float onSameLineThreshold = 0.05f;
 
+        [Tooltip("カラーリング")]
+        [SerializeField] private CarColor colorObject;
+
         //検出された車
         private List<Car> carsDetectedFront = new List<Car>();
         private List<Car> carsDetectedFrontLeft = new List<Car>();
@@ -261,6 +272,7 @@ namespace InGame
         private void Start()
         {
             InitializeSpeed();
+            colorObject.UpdateColor(happinessRatio);
         }
 
         private void Update()
@@ -1563,6 +1575,9 @@ namespace InGame
 
             //満足度を計算
             CalculateHappiness();
+
+            //色を更新
+            colorObject.UpdateColor(happinessRatio);
         }
 
         /// <summary>
