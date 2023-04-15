@@ -2118,6 +2118,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 370.4
       objectReference: {fileID: 0}
+    - target: {fileID: 8948189579902642273, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
 --- !u!224 &2065384314 stripped

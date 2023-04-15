@@ -275,12 +275,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecf67e20f03c7f34783ff17b4a62f111, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
   runningRoadT: 0.74
   runningRoadV0: 2
   runningRoadT1: 2.45
   runningRoadT2: 0.77
   runningRoadR: 1
-  runningRoadRp: 2
+  runningRoadRp: 10
   runningRoadD: 0.5
   spawnedSpeedCoef: 0.75
   runningRoadSameDirectionThreshold: 60
