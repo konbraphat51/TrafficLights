@@ -252,7 +252,16 @@ MonoBehaviour:
   changingLaneStopDistance: 0.5
   changingLaneRotationSpeed: 10
   changingLaneAngularSpeed: 20
-  state: 0
+  saveSpeedInterval: 0.5
+  happinessCalculationInterval: 1
+  happinessChangeThresholds:
+  - 0.1
+  - 0.25
+  - 0.7
+  - 0.85
+  - 1
+  happinessChangements: fdffffffffffffff000000000100000002000000
+  happiness: 80
   roadsParallelThreshold: 10
   thresholdRadiusChangingLane: 1
   angleMaxChangingLane: 40
