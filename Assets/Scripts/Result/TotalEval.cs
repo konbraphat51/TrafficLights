@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using InGame;
 
 public class TotalEval : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI colorText;
-    [SerializeField] SpriteRenderer colorCircle;
+    [SerializeField] Image colorCircle;
     // Start is called before the first frame update
     void Start()
     {
