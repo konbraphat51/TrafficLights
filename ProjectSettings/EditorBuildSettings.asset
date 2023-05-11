@@ -18,7 +18,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Result.unity
     guid: 680a8ec900740bf4f92277a55d4ff136
   - enabled: 1
-    path: Assets/Scenes/InGame/InGameSquare.unity
+    path: Assets/Scenes/InGame/InGameUmeda.unity
     guid: c28dc295241546340a76322935e28649
   - enabled: 1
     path: Assets/Scenes/InGame/InGameHongo.unity
