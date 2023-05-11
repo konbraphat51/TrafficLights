@@ -276,12 +276,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates:
-  - eventID: 0
+  - eventID: 4
     callback:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 6503057669073564933}
-          m_TargetAssemblyTypeName: Opening.SelectionButton, Assembly-CSharp
+          m_TargetAssemblyTypeName: Opening.SceneButton, Assembly-CSharp
           m_MethodName: OnClick
           m_Mode: 1
           m_Arguments:
