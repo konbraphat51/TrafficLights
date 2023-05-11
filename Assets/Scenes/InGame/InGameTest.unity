@@ -1339,6 +1339,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 273477872931729702, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
+      propertyPath: gameTime
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 273477873070338371, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
       propertyPath: expectedCars
       value: 1
@@ -1455,6 +1459,10 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 2079992683}
+    - target: {fileID: 7370981898357670719, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
 --- !u!224 &2065384314 stripped

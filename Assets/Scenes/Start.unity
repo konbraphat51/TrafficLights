@@ -514,17 +514,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3528168415509190550, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: m_text
-      value: 'Normal : Hongo
+      value: 'Easy : Hongo
 
 '
       objectReference: {fileID: 0}
     - target: {fileID: 4188137737837857369, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: m_text
-      value: "\u3075\u3064\u3046\uFF1A\u30DB\u30F3\u30B4\u30A6"
+      value: "\u304B\u3093\u305F\u3093\uFF1A\u30DB\u30F3\u30B4\u30A6"
       objectReference: {fileID: 0}
     - target: {fileID: 6503057669073564933, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: sceneName
-      value: InGameSquare
+      value: InGameHongo
       objectReference: {fileID: 0}
     - target: {fileID: 7056406220901612562, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: m_Name
@@ -594,19 +594,21 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3528168415509190550, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: m_text
-      value: 'Easy : Square'
+      value: 'Normal : Umeda
+
+'
       objectReference: {fileID: 0}
     - target: {fileID: 4188137737837857369, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: m_text
-      value: "\u304B\u3093\u305F\u3093 : \u30B9\u30AF\u30A8\u30A2"
+      value: "\u3075\u3064\u3046\uFF1A\u30A6\u30E1\u30C0\n"
       objectReference: {fileID: 0}
     - target: {fileID: 6503057669073564933, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: sceneName
-      value: InGameSquare
+      value: InGameUmeda
       objectReference: {fileID: 0}
     - target: {fileID: 7056406220901612562, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: m_Name
-      value: Square
+      value: Umeda
       objectReference: {fileID: 0}
     - target: {fileID: 7056406220901612564, guid: 17799217f21610149835424efd4d3269, type: 3}
       propertyPath: m_Sprite
