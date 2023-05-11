@@ -26,6 +26,8 @@ namespace InGame
 
         private bool initialized = false;
 
+        public int spawnedN { get; private set; } = 0;
+
         private void Update()
         {
             if (initialized 
@@ -116,6 +118,9 @@ namespace InGame
 
                 //オブジェクト生成
                 InstantiateCar(spawnPoint);
+
+                //数える
+                spawnedN++;
             }
         }
 

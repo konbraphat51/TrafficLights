@@ -21,6 +21,11 @@ namespace InGame
         /// </summary>
         public static int score { get; private set; } = 0;
 
+        /// <summary>
+        /// ボーナス
+        /// </summary>
+        public static int bonus { get; private set; } = 0;
+
         [Header("スコア関係")]
 
         [Tooltip("最高速度との差に何乗するか")]
@@ -28,6 +33,9 @@ namespace InGame
 
         [Tooltip("得点を単純拡大する")]
         [SerializeField] private float scoreCoef = 100f;
+
+        [Tooltip("ボーナス最大")]
+        [SerializeField] private int bonusMax = 400;
 
         [Header("タイム")]
 
@@ -160,6 +168,8 @@ namespace InGame
 
             Invoke(nameof(GotoResult), gameFinishedWait);
 
+            SetBonus();
+
             UIManager.Instance.OnGameFinished();
         }
 
@@ -202,6 +212,17 @@ namespace InGame
 
             //UI更新
             UIManager.Instance.OnPointsChanged(addition);
+        }
+
+        /// <summary>
+        /// ボーナスポイントを決める
+        /// </summary>
+        private void SetBonus()
+        {
+            int generated = CarGenerator.Instance.spawnedN;
+            int alive = FindObjectsOfType<Car>().Length;
+
+            bonus = (int)((1f - ((float)alive / (float)generated)) * bonusMax);
         }
 
         /// <summary>
