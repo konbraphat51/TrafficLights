@@ -1,0 +1,415 @@
+[33mcommit 5cff13a0ec04830efbfbc2fdf4112875183e03c2[m[33m ([m[1;36mHEAD -> [m[1;32madd_map[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu May 11 17:56:44 2023 +0900
+
+    本郷マップ追加
+
+[33mcommit 00a57b19e9e031d02122e7f10a227cd8a84f7612[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu May 11 17:55:37 2023 +0900
+
+    東大イラスト挿入
+
+[33mcommit c54fc0b90e4ad88202a21c9dba2f6e190249c319[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu May 11 17:30:28 2023 +0900
+
+    スクエアマップ追加
+
+[33mcommit dbe0c99d35593510d49e8ced6af228b88debb620[m[33m ([m[1;31morigin/interface[m[33m, [m[1;32minterface[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu May 11 17:05:48 2023 +0900
+
+    スプライト透過してタッチ可能に
+
+[33mcommit 7959847772164ba65a19349c4a9e46b71977bb5d[m[33m ([m[1;31morigin/bonus[m[33m, [m[1;32mbonus[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu May 11 16:39:54 2023 +0900
+
+    calculate bonus + show at result
+
+[33mcommit 7114c64e458e9635656f1dd18865bd74cbc62c93[m
+Merge: fb81ad5 cbed3b6
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu May 11 12:26:50 2023 +0900
+
+    Merge branch 'interface'
+
+[33mcommit cbed3b6953101b9e9afcfedd5989218de063ee5e[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu May 11 12:25:09 2023 +0900
+
+    交差点透過
+
+[33mcommit df0527d19491c53ee9b6a13e0c4ed5a3b041d48a[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu May 11 12:22:16 2023 +0900
+
+    demo
+
+[33mcommit d744e24de38a7af69336960ab64528d6f845fdd4[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu May 11 12:18:19 2023 +0900
+
+    タップ可能に
+
+[33mcommit bcc76286f049637f5aebd8016e2c193a26da25d8[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu May 11 12:16:07 2023 +0900
+
+    キーUI
+
+[33mcommit fb81ad54d5e3cf9cdca957a6b977d365f6b65cc9[m
+Author: gitdmnt <100859051+gitdmnt@users.noreply.github.com>
+Date:   Thu May 11 04:54:03 2023 +0900
+
+    タイトル画面のデザイン終わり
+
+[33mcommit 72e1c738345a785ebccf011801ffb2ddd60e42d1[m[33m ([m[1;31morigin/result[m[33m, [m[1;32mresult[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 07:22:14 2023 +0900
+
+    リザルト画面簡易的に
+
+[33mcommit 6e8056a4b831ce961c0476a120ea0bef9e514c9b[m[33m ([m[1;31morigin/time[m[33m, [m[1;32mtime[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 07:07:53 2023 +0900
+
+    終了UI
+
+[33mcommit 8b25b813d7fec51a60ad2ef89992ae7bdaa01954[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 06:52:36 2023 +0900
+
+    時間表示ずらす
+
+[33mcommit 6ca51c838c021c15dcd11ae9b8f099f361ef627e[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 06:51:29 2023 +0900
+
+    時間表示
+
+[33mcommit 72d8398949b024a2e0660b62c22c318aaba2084d[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 06:31:54 2023 +0900
+
+    内部的に時間処理
+
+[33mcommit 10791f2680057fe903494cec2fb9f5040c2ffa68[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 05:57:48 2023 +0900
+
+    パラメーター調整
+
+[33mcommit d1e04d23b1bd510e28351f22a050274a4c696cad[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 05:55:22 2023 +0900
+
+    フォントを入れなおし
+
+[33mcommit b548e77512436f39748bf4529e1859604198bfe9[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 05:44:21 2023 +0900
+
+    フォントを軽量化
+
+[33mcommit d56243c4c05c26dec66bba5a3ab11ebe5be9388e[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 05:29:19 2023 +0900
+
+    フォントを縮小
+
+[33mcommit 23a012e9ef9a687134c87a3e9d195f0bc1e178fc[m[33m ([m[1;32mui[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 05:17:10 2023 +0900
+
+    加点UI
+
+[33mcommit acdbc8519752839c0676938ff34813b753bb8422[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 04:50:14 2023 +0900
+
+    オープニング画面リファクタリング
+
+[33mcommit 0906a7965e429b549ea90c87acc71a97c5e25b56[m
+Merge: 1e3b542 d488960
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 04:08:24 2023 +0900
+
+    小宮openingマージ前のコミット
+
+[33mcommit 1e3b54243d4e14ea6830a190055ce85a087e5584[m[33m ([m[1;31morigin/ui[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 04:06:08 2023 +0900
+
+    平松道路適用
+
+[33mcommit 81c57a4ca70dcbdc2c176e9f7f8208edf4bbe42c[m[33m ([m[1;31morigin/happiness[m[33m, [m[1;32mhappiness[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 03:46:41 2023 +0900
+
+    満足度表示
+
+[33mcommit 2c82f61476ca91a95e29b02e3b0bf08fc0adafe9[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 02:59:09 2023 +0900
+
+    加点方式を改善
+
+[33mcommit 25aaac2ea85c571088c38441b4b5985a27bd51a3[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Apr 16 02:32:21 2023 +0900
+
+    到着時に加点
+
+[33mcommit d4889600cb66f9cb14922e56fea21c449f905aad[m[33m ([m[1;31morigin/Opening[m[33m)[m
+Author: Miyako <masacchi1588@gmail.com>
+Date:   Mon Apr 10 11:30:49 2023 +0900
+
+    Add Start Menu
+
+[33mcommit 7879e02e0b3e725905bb53b697748d7fee507d83[m[33m ([m[1;32mdebug[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sat Apr 8 03:25:39 2023 +0900
+
+    debug
+
+[33mcommit 3da37547575303b8e7a0b9f4acb2e5e637b8adcd[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sat Apr 8 03:04:13 2023 +0900
+
+    runningJoint時は次の道路もみる
+
+[33mcommit 46431f52ea68551dea9afb9fb5f6e23ab8bf0b46[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sat Apr 8 02:34:18 2023 +0900
+
+    runningJoint時は次の道路もみる
+
+[33mcommit b494aaf7d7d665b24338ee7d8befebf9bfad676e[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Fri Apr 7 20:02:49 2023 +0900
+
+    車線選択
+
+[33mcommit eaeb99404aa3f6f213ee0cf5568293029bf7a863[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Fri Apr 7 17:01:34 2023 +0900
+
+    シーン名変更
+
+[33mcommit 28ca328c74cbf60b025ffd4b1b6bb12c4fe4555d[m[33m ([m[1;31morigin/car_sensing[m[33m, [m[1;32mcar_sensing[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Fri Apr 7 17:00:21 2023 +0900
+
+    キー割り当て
+
+[33mcommit 2f8fb184659f3e26981a76c6655df6dd6c537df1[m[33m ([m[1;31morigin/sensing_debug[m[33m, [m[1;32msensing_debug[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Fri Apr 7 16:45:30 2023 +0900
+
+    runningRoad時の検出先の調整
+
+[33mcommit e416df119ea711fe5d4555a651ec4c4f521d6e6f[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Fri Apr 7 16:34:52 2023 +0900
+
+    changingLaneの速度
+
+[33mcommit 6730a7b8c2f68802a597e667e64d4fcfe4f79507[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Fri Apr 7 12:56:09 2023 +0900
+
+    信号機で止まるように
+
+[33mcommit 76aa4eeafe531f6a25a3659f5108e143bf9de981[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Fri Apr 7 10:03:43 2023 +0900
+
+    SpawningPointから検出ビーム
+
+[33mcommit 400f7f097766f0b6c3d4ae4552a777089e04e68c[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Fri Apr 7 09:41:56 2023 +0900
+
+    RunningJointのGFM適用
+
+[33mcommit 6789d753d8b0341b055a310f41ec170ef9d25345[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu Apr 6 23:06:52 2023 +0900
+
+    runningRoadのGFM計算
+
+[33mcommit 5fbe6a6d78bbeaf85b4e4dd7e74eac99fbe91868[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Thu Apr 6 17:17:20 2023 +0900
+
+    周囲の検知
+
+[33mcommit 271faf06cecbe33d8f5f2795090608114a9b546c[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Wed Apr 5 08:49:18 2023 +0900
+
+    carがビームの始点終点を保持
+
+[33mcommit 34cb34025dce01e1ee2646825e407e489584138f[m[33m ([m[1;31morigin/cars[m[33m, [m[1;32mcars[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Wed Apr 5 08:47:19 2023 +0900
+
+    4交差点に起こるエラーを解消
+
+[33mcommit 6fcb7a565deb133a89925d8d6f63c11e2f1d0d4b[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Apr 4 15:39:39 2023 +0900
+
+    3交差点の信号機の並び
+
+[33mcommit d8ac746d50f7d2212c78e3217054fad756b43832[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Apr 4 14:58:26 2023 +0900
+
+    リファクタリング：数学クラスを作成
+
+[33mcommit 13904ad5c2285215c1d5bba6546a791782cd1a24[m[33m ([m[1;31morigin/cars_debug[m[33m, [m[1;32mcars_debug[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Apr 4 14:19:47 2023 +0900
+
+    車線変更完了
+
+[33mcommit be3cbfecdfffefe0b8fa2fcbc9d26e7ad718aefc[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Apr 4 13:30:14 2023 +0900
+
+    車線変更が不要なものを省略
+
+[33mcommit ae1426b12a0405242f2ad1df3f8402c4989dacc6[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Apr 4 12:44:54 2023 +0900
+
+    通常カーブの破損を解決
+
+[33mcommit 23ac3d8d6f22aa45b5a58ca05fc48e4e55c325a6[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Apr 4 11:25:19 2023 +0900
+
+    差分確認
+
+[33mcommit 483a489427b70e3b933b8631c8090a69950ca4f5[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Apr 4 03:55:57 2023 +0900
+
+    RoadJointまでにワープしてしまうバグを解消
+
+[33mcommit c0483b4ff14226fe949da73d8d7413d9de442e9a[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Apr 4 03:13:36 2023 +0900
+
+    経路探索
+
+[33mcommit 64072b630cc16a9303dcb5cf92e1be1c38039fb6[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sat Apr 1 23:31:17 2023 +0900
+
+    2車線の曲がりを自然に
+
+[33mcommit ab03eb74ef6925dcd50d588810fcff9e887b08ad[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Mar 21 20:30:08 2023 +0900
+
+    直線的
+
+[33mcommit 71a8c34562d09ef850ca263176c74f8341e48eb2[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Wed Mar 15 00:07:50 2023 +0900
+
+    RoadJointが時計回りを保持
+
+[33mcommit 9d3e0d9a11aff86ad05095f77a9eeea3c0ccd5bc[m[33m ([m[1;31morigin/input[m[33m, [m[1;32minput[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Feb 28 02:10:40 2023 +0900
+
+    キー入力で黄→次のパターン
+
+[33mcommit c85266c6fd15de5c6c8293f1eeea181cfd89eb2e[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Feb 28 01:34:30 2023 +0900
+
+    InputManager導入
+
+[33mcommit 896e3c9de7bb11e9604590659f03d3c81b54d361[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Feb 28 01:26:03 2023 +0900
+
+    信号システムの状態遷移図
+
+[33mcommit 7cf8ecd91c007967a52af8941d7498096352993b[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Feb 28 01:18:14 2023 +0900
+
+    信号機プレハブを修正
+
+[33mcommit 0c55ac213f9b96aaeb2065712849e5efd5b2d599[m[33m ([m[1;31morigin/roads[m[33m, [m[1;32mroads[m[33m)[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Tue Feb 28 01:05:11 2023 +0900
+
+    道路・信号フレームワーク完成
+
+[33mcommit 64af20824e2ce4733329d866c27c03bf761984ba[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Mon Feb 27 23:36:41 2023 +0900
+
+    信号機初期化処理シーケンス図
+
+[33mcommit f86e707e9442b61573154a56bb831a5a8c6bab4a[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Mon Feb 27 02:08:48 2023 +0900
+
+    TrafficLightを初期化
+
+[33mcommit 8a0fe3e337b3475ccaa19d08b505b057bb0e335d[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Mon Feb 27 01:10:58 2023 +0900
+
+    TrafficLightsSystemの初期化
+
+[33mcommit d9dec8bc5ab269cfd2a3b19996c831e5f9f6d65b[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Feb 26 14:52:43 2023 +0900
+
+    配置最適化
+
+[33mcommit 84b9ddcd7d8a9ae5ce95993c0426d164f509aa6e[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Feb 26 14:15:23 2023 +0900
+
+    クラスを用意
+
+[33mcommit e4d4df4418ffad6653fc2169531628306dcea7d0[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sun Feb 26 13:48:03 2023 +0900
+
+    解像度の設定、キャンバスの設置
+
+[33mcommit d2df3405bffe4284c5328f1877c18608060d717d[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Fri Feb 24 20:26:34 2023 +0900
+
+    シーンファイルを用意
+
+[33mcommit e6d11d09b6b9abcffeee505fc426d32268c71971[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sat Feb 18 20:54:11 2023 +0900
+
+    クラス図原案
+
+[33mcommit 2b3cb3fcb3ef15eee29a15817cfaa1d5b688f115[m
+Author: konbraphat51 <brightray48@zeus.eonet.ne.jp>
+Date:   Sat Feb 18 19:32:06 2023 +0900
+
+    unityデフォルト
+
+[33mcommit c457cf4afd4d584e40c5f2858d500eaf7ea730f0[m
+Author: konbraphat51 <101827492+konbraphat51@users.noreply.github.com>
+Date:   Wed Feb 15 18:28:33 2023 +0900
+
+    Initial commit
