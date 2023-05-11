@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: fecdfed84fbe20944a0b7daabe8cf66c
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - FOT-Cezanne Pro
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: aa70ca7fdb85b8643a394cc6136df494, type: 3}
+  - {fileID: 12800000, guid: dcb23df3ae6d1884f9563d9151c8be97, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
