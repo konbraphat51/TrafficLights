@@ -1341,7 +1341,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 273477872931729702, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
       propertyPath: gameTime
-      value: 20
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 273477872931729702, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
+      propertyPath: _aThreshold
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 273477872931729702, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
+      propertyPath: _bThreshold
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 273477873070338371, guid: d9a5e7fe4fea3064d845ef95c46e05d9, type: 3}
       propertyPath: expectedCars
