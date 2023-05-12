@@ -37,6 +37,15 @@ namespace InGame
         [Tooltip("ボーナス最大")]
         [SerializeField] private int bonusMax = 400;
 
+        [Tooltip("C→B")]
+        [SerializeField] private int _bThreshold = 900;
+
+        [Tooltip("B→A")]
+        [SerializeField] private int _aThreshold = 1300;
+
+        public static int bThreahold = 0;
+        public static int aThreahold = 0;
+
         [Header("タイム")]
 
         [Tooltip("ゲーム時間（秒）")]
@@ -62,6 +71,8 @@ namespace InGame
             //変数初期化
             gameTimeLeft = gameTime;
             score = 0;
+            aThreahold = _aThreshold;
+            bThreahold = _bThreshold;
         }
 
         private void Update()

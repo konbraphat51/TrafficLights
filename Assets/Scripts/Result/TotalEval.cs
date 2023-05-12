@@ -17,12 +17,12 @@ public class TotalEval : MonoBehaviour
         var orange = new Color(0.92f, 0.65f, 0.24f);
         var yellow = new Color(0.85f, 0.83f, 0.46f);
         string s;
-        if (totalScore < 500) {
+        if (totalScore < GameManager.bThreahold) {
             colorText.color = yellow;
             colorCircle.color = yellow;
             s = "C";
         }
-        else if (totalScore < 1000) {
+        else if (totalScore < GameManager.aThreahold) {
             colorText.color = orange;
             colorCircle.color = orange;
             s = "B";
