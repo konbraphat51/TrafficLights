@@ -23,4 +23,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/InGame/InGameHongo.unity
     guid: 304da635a82e8dc498ec48e93ed0c17e
+  - enabled: 1
+    path: Assets/Scenes/InGame/InGameKosan.unity
+    guid: 183727c516a2bcb4cb786fc20a3ede48
   m_configObjects: {}
