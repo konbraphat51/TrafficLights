@@ -59,6 +59,9 @@ namespace InGame
         [Tooltip("リザルト画面のシーン名")]
         [SerializeField] private string resultSceneName = "Result";
 
+        [Tooltip("スタート画面のシーン名")]
+        [SerializeField] private string startSceneName = "Start";
+
         public float countDownTimeLeft { get; private set; } = 3f;
 
         public float gameTimeLeft { get; private set; } = 61f;
@@ -242,6 +245,14 @@ namespace InGame
         private void GotoResult()
         {
             SceneManager.LoadScene(resultSceneName);
+        }
+
+        /// <summary>
+        /// タイトルへ戻る
+        /// </summary>
+        public void Quit()
+        {
+            SceneManager.LoadScene(startSceneName);
         }
     }
 }
